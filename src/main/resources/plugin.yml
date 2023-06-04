@@ -1,0 +1,8 @@
+name: BlossomSG
+version: '${project.version}'
+main: me.ammelsallow.blossomsg.BlossomSG
+commands:
+  compass:
+    description: gives compass
+  kit:
+    description: gives kit
