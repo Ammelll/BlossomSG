@@ -3,6 +3,7 @@ me/ammelsallow/blossomsg/Listeners/InteractListener.class
 me/ammelsallow/blossomsg/Listeners/EntityDamageListener.class
 me/ammelsallow/blossomsg/Game$4.class
 me/ammelsallow/blossomsg/Listeners/ArmorStandInteractListener.class
+me/ammelsallow/blossomsg/Model/PlayerStats.class
 me/ammelsallow/blossomsg/Tasks/CapturePointUpdate.class
 me/ammelsallow/blossomsg/TeleportCollision.class
 me/ammelsallow/blossomsg/Listeners/MenuListener.class
@@ -12,6 +13,7 @@ me/ammelsallow/blossomsg/Tasks/UpdateTemporaryBlocks.class
 me/ammelsallow/blossomsg/PlayerKitSelection.class
 me/ammelsallow/blossomsg/Mobs/ArmorStandNoClip.class
 me/ammelsallow/blossomsg/RandomEvent$2.class
+me/ammelsallow/blossomsg/DB/Database.class
 me/ammelsallow/blossomsg/Game$1.class
 me/ammelsallow/blossomsg/Listeners/ItemMergeListener.class
 me/ammelsallow/blossomsg/Listeners/BlockPlaceListener.class
