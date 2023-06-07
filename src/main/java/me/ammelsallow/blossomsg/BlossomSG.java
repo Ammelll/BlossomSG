@@ -2,6 +2,7 @@ package me.ammelsallow.blossomsg;
 
 import me.ammelsallow.blossomsg.Commands.KitMenuCommand;
 import me.ammelsallow.blossomsg.Commands.giveCompass;
+import me.ammelsallow.blossomsg.DB.Database;
 import me.ammelsallow.blossomsg.Listeners.*;
 import me.ammelsallow.blossomsg.Mobs.ArmorStandNoClip;
 import me.ammelsallow.blossomsg.Tasks.CapturePointUpdate;
@@ -18,11 +19,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public final class BlossomSG extends JavaPlugin {
 
     private ArrayList<Game> games = new ArrayList<>();
+    private Database database;
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -43,6 +47,19 @@ public final class BlossomSG extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(this),this);
         getServer().getPluginManager().registerEvents(new BlockDestroyListener(),this);
         getServer().getPluginManager().registerEvents(new ItemMergeListener(),this);
+        try{
+            this.database = new Database();
+            database.initializeDatabase();
+        }catch (SQLException e){
+            e.printStackTrace();
+            System.out.println("Unable to connect to DB and create tables");
+        }
+    }
+    public void onDisable(){
+        this.database.closeConnection();
+    }
+    public Database getDatabased() {
+        return database;
     }
 
     public ArrayList<Game> getGames(){

@@ -1,5 +1,6 @@
 package me.ammelsallow.blossomsg;
 
+import me.ammelsallow.blossomsg.Model.PlayerStats;
 import me.ammelsallow.blossomsg.Tasks.CapturePointUpdate;
 import me.ammelsallow.blossomsg.Tasks.CheckForWinner;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -18,7 +19,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -30,11 +33,14 @@ public class Game {
     public String name;
     private boolean started;
     private HashMap<UUID,Integer> playerKills;
+    private HashMap<UUID,Integer> playerDeaths;
+    private HashMap<UUID,Integer> playerGold;
     private final static String sgPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "Blossom" + ChatColor.DARK_GRAY + "] ";
 
     private int capacity;
     private BukkitTask capturePointUpdate;
     private ArrayList<Player> players;
+    private ArrayList<Player> startingPlayers;
     private BlossomSG plugin;
     public Game(BlossomSG _plugin, int _capacity, String name){
         this.name = name;
@@ -69,6 +75,22 @@ public class Game {
             playerKills.put(p.getUniqueId(),kills+1);
         } else{
             playerKills.put(p.getUniqueId(),1);
+        }
+    }
+    public void addDeath(Player p){
+        if(playerDeaths.containsKey(p.getUniqueId())){
+            int deaths = playerDeaths.get(p.getUniqueId());
+            playerDeaths.put(p.getUniqueId(),deaths+1);
+        } else{
+            playerDeaths.put(p.getUniqueId(),1);
+        }
+    }
+    public void addGold(Player p){
+        if(playerGold.containsKey(p.getUniqueId())){
+            int gold = playerGold.get(p.getUniqueId());
+            playerGold.put(p.getUniqueId(),gold+1);
+        } else{
+            playerGold.put(p.getUniqueId(),1);
         }
     }
     public int getKills(Player p){
@@ -202,6 +224,7 @@ public class Game {
         capture = new CapturePointUpdate(this);
         Inventory inventory;
         for(Player p : players){
+            startingPlayers.add(p);
             capture.setScoreboard(p);
             p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,630,4));
             p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS,630,4));
@@ -292,7 +315,11 @@ public class Game {
                             countDown--;
                         } else {
                             capturePointUpdate.cancel();
-                            closeGame();
+                            try {
+                                closeGame(winner);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
                             Bukkit.getScheduler().cancelTask(save);
                         }
 
@@ -300,7 +327,34 @@ public class Game {
                 }, 20, 20);
             }
         }
-        public void closeGame(){
+        public void closeGame(Player winner) throws SQLException {
+        //Update Database Stats
+            //TODO
+            for(Player player : startingPlayers){
+                if(playerKills.containsKey(player.getUniqueId())) {
+                    PlayerStats pStats = getPlayerStatsFromDatabase(player);
+                    pStats.setKills(pStats.getKills() + playerKills.get(player.getUniqueId()));
+                }
+                if(playerDeaths.containsKey(player.getUniqueId())){
+                    PlayerStats pStats = getPlayerStatsFromDatabase(player);
+                    pStats.setDeaths(pStats.getDeaths() + playerDeaths.get(player.getUniqueId()));
+                }
+                if(playerGold.containsKey(player.getUniqueId())){
+                    PlayerStats pStats = getPlayerStatsFromDatabase(player);
+                    pStats.setGold(pStats.getGold() + playerGold.get(player.getUniqueId()));
+                }
+            }
+            PlayerStats winnerStats = getPlayerStatsFromDatabase(winner);
+            winnerStats.setWins(winnerStats.getWins() +1);
+            //Update Kills
+
+            //Update Deaths
+            //Update Gold
+            //Update Wins
+
+
+
+
             plugin.removeGame(this);
             for(Player p : players){
                 p.getActivePotionEffects().forEach(potionEffect -> p.removePotionEffect(potionEffect.getType()));
@@ -351,5 +405,15 @@ public class Game {
         public BlossomSG getPlugin() {
         return plugin;
     }
+        private PlayerStats getPlayerStatsFromDatabase(Player p) throws SQLException {
+            PlayerStats stats = this.plugin.getDatabased().findPlayerStatsByUUID(p.getUniqueId().toString());
+            if(stats == null){
+                stats = new PlayerStats(p.getUniqueId().toString(), 0,0,0,0,new Date(),new Date());
+
+                this.plugin.getDatabased().createPlayerStats(stats);
+                return stats;
+            }
+            return stats;
+        }
 
 }
