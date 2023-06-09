@@ -3,15 +3,14 @@ package me.ammelsallow.blossomsg.Listeners;
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game;
 import me.ammelsallow.blossomsg.PlayerKitSelection;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import me.ammelsallow.blossomsg.Maps.SGMap;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,6 +27,18 @@ public class MenuListener implements Listener {
         Inventory inventory = e.getInventory();
         if(e.getClickedInventory() == null){
             return;
+        }
+        if(inventory.getType() == InventoryType.CHEST){
+            if(e.getCurrentItem().getType() == Material.GOLD_INGOT){
+                if(e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.LIGHT_PURPLE + "5 Gold")){
+                    e.setCancelled(true);
+                    inventory.setItem(e.getSlot(),new ItemStack(Material.AIR));
+                    ((Player)e.getWhoClicked()).playSound(e.getWhoClicked().getLocation(), Sound.LEVEL_UP,2f,2f);
+                    if(plugin.getGame((Player)e.getWhoClicked()) !=null){
+                        plugin.getGame((Player) e.getWhoClicked()).addGold((Player)e.getWhoClicked(),5);
+                    }
+                }
+            }
         }
         if(e.getInventory().getTitle().equalsIgnoreCase(ChatColor.BLACK + "" + ChatColor.BOLD + "Kit Selector")) {
             e.setCancelled(true);
@@ -55,18 +66,25 @@ public class MenuListener implements Listener {
             Player player = (Player) e.getWhoClicked();
             switch(e.getCurrentItem().getType()){
                 case DIAMOND_SWORD:
-                    Location location = new Location(Bukkit.getWorld("sg4"),0,50,0);
-                    player.teleport(location);
-                    Inventory inv = player.getInventory();
-                    inv.clear();
                     if(plugin.getEmptyGame() != null){
-                        Game game = plugin.getEmptyGame();
-                        game.join(player);
-                    } else {
-                        Game game = new Game(plugin,4,"1");
+                        plugin.getEmptyGame().join(player);
+                    } else{
+                        Game game = new Game(plugin, SGMap.randomFrommPool());
                         plugin.addGame(game);
                         game.join(player);
                     }
+                    //PHASED OUT
+//                    Location location = new Location(Bukkit.getWorld("sg4"),0,50,0);
+//                    player.teleport(location);
+
+//                    if(plugin.getEmptyGame() != null){
+//                        Game game = plugin.getEmptyGame();
+//                        game.join(player);
+//                    } else {
+//                        Game game = new Game(plugin,4,"1");
+//                        plugin.addGame(game);
+//                        game.join(player);
+//                    }
                     break;
             }
             e.setCancelled(true);

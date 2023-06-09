@@ -24,6 +24,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
@@ -51,6 +53,7 @@ public class giveCompass implements CommandExecutor {
         i.setItem(3, CustomItems.getNethermagePotions());
         i.setItem(4, CustomItems.getRobinhoodBow());
         i.setItem(5, CustomItems.getCompassSelector());
+        resetScoreboard(p);
 //        p.setWalkSpeed(0.2f);
 //        p.getInventory().addItem(getPayDay());
 //        summonSupplyDrop();
@@ -95,7 +98,10 @@ public class giveCompass implements CommandExecutor {
             }
         },5,1);
     }
-
+    public void resetScoreboard(Player p){
+        Scoreboard scoreboard = p.getScoreboard();
+        scoreboard.getEntries().forEach(entry -> scoreboard.resetScores(entry));
+    }
     public static class KitMenuCommand implements CommandExecutor {
 
 

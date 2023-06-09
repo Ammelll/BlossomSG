@@ -23,11 +23,11 @@ public class Database {
 
     public void initializeDatabase() throws SQLException {
         Statement statement = getConnection().createStatement();
-        String sql = "CREATE TABLE IF NOT EXISTS player_stats(uuid varchar(36) primary key, deaths int, kills int, gold int , last_login DATE, last_logout DATE)";
+        String sql = "CREATE TABLE IF NOT EXISTS player_stats(uuid varchar(36) primary key, deaths int, kills int, gold int, wins int, last_login DATE, last_logout DATE)";
         statement.execute(sql);
 
         statement.close();
-        System.out.println("created tables");
+        System.out.println("created tabless");
     }
     public PlayerStats findPlayerStatsByUUID(String uuid) throws SQLException {
 
@@ -55,26 +55,28 @@ public class Database {
     public void createPlayerStats(PlayerStats playerStats) throws SQLException{
 
         PreparedStatement statement = getConnection()
-                .prepareStatement( "INSERT INTO player_stats(uuid,deaths,kills,gold,last_login,last_logout) VALUES (? ,?,?,?,?,?)");
+                .prepareStatement( "INSERT INTO player_stats(uuid,deaths,kills,gold, wins, last_login,last_logout) VALUES (? ,?,?,?,?,?,?)");
         statement.setString(1, playerStats.getUuid());
         statement.setInt(2,playerStats.getDeaths());
         statement.setInt(3,playerStats.getKills());
         statement.setInt(4,playerStats.getGold());
-        statement.setDate(5,new Date(playerStats.getLast_login().getTime()));
-        statement.setDate(6, new Date(playerStats.getLast_logout().getTime()));
+        statement.setInt(5,playerStats.getWins());
+        statement.setDate(6,new Date(playerStats.getLast_login().getTime()));
+        statement.setDate(7, new Date(playerStats.getLast_logout().getTime()));
 
         statement.executeUpdate();
         statement.close();
     }
     public void updatePlayerStats(PlayerStats playerStats) throws SQLException {
         PreparedStatement statement = getConnection()
-                .prepareStatement( "UPDATE player_stats SET deaths = ?,kills = ?, gold = ?, last_login = ?, last_logout = ? WHERE uuid = ?");
+                .prepareStatement( "UPDATE player_stats SET deaths = ?,kills = ?, gold = ?, wins = ?, last_login = ?, last_logout = ? WHERE uuid = ?");
         statement.setInt(1,playerStats.getDeaths());
         statement.setInt(2,playerStats.getKills());
         statement.setInt(3,playerStats.getGold());
-        statement.setDate(4,new Date(playerStats.getLast_login().getTime()));
-        statement.setDate(5, new Date(playerStats.getLast_logout().getTime()));
-        statement.setString(6, playerStats.getUuid());
+        statement.setInt(4,playerStats.getWins());
+        statement.setDate(5,new Date(playerStats.getLast_login().getTime()));
+        statement.setDate(6, new Date(playerStats.getLast_logout().getTime()));
+        statement.setString(7, playerStats.getUuid());
 
         statement.executeUpdate();
         statement.close();

@@ -1,8 +1,0 @@
-name: BlossomSG
-version: '1.0-SNAPSHOT'
-main: me.ammelsallow.blossomsg.BlossomSG
-commands:
-  compass:
-    description: gives compass
-  kit:
-    description: gives kit

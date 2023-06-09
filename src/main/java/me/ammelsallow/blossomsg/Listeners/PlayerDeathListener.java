@@ -30,9 +30,7 @@ public class PlayerDeathListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e){
         Player p = e.getEntity();
-        for(Game g : plugin.getGames()){
-            g.leave(p);
-        }
+
         PlayerConnection connection = ((CraftPlayer) p.getPlayer()).getHandle().playerConnection;
         String titleString = ChatColor.RED + "" + ChatColor.BOLD + "You Died!";
         IChatBaseComponent text = IChatBaseComponent.ChatSerializer.a("{'text': ' " + titleString + " ' }");
@@ -40,15 +38,17 @@ public class PlayerDeathListener implements Listener {
         connection.sendPacket(packet);
         Player killer = p.getKiller();
         if(killer != null){
-            if(plugin.getGame(killer) == null){
-                return;
+            if(plugin.getGame(killer) != null) {
+                plugin.getGame(killer).addKill(killer);
+                plugin.getGame(killer).addGold(killer,150);
             }
-            plugin.getGame(killer).addKill(killer);
         }
         if(plugin.getGame(p) != null){
             plugin.getGame(p).addDeath(p);
         }
-
+        for(Game g : plugin.getGames()){
+            g.leave(p);
+        }
 
     }
     @EventHandler

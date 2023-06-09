@@ -16,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -248,7 +249,12 @@ public class InteractListener implements Listener {
     }
     public void randomizeLoot(Chest unr){
         Short s = 62;
-        LootItem[] lootTable = {new LootItem(new ItemStack(Material.GOLDEN_APPLE),0.2), new LootItem(new ItemStack(Material.DIAMOND),0.3), new LootItem(new ItemStack(Material.IRON_INGOT),0.4),new LootItem(new ItemStack(Material.IRON_LEGGINGS),0.5),new LootItem(new ItemStack(Material.IRON_CHESTPLATE),0.5), new LootItem(new ItemStack(Material.EXP_BOTTLE,3),0.5), new LootItem(new ItemStack(Material.FISHING_ROD,1,s),0.75), new LootItem(new ItemStack(Material.IRON_BOOTS),0.6), new LootItem(new ItemStack(Material.STONE_SWORD),1), new LootItem(new ItemStack(Material.BOW),1.2), new LootItem(new ItemStack(Material.IRON_HELMET),1.2),new LootItem(new ItemStack(Material.COOKED_BEEF,3),1.2), new LootItem(new ItemStack(Material.CHAINMAIL_LEGGINGS),1.3), new LootItem(new ItemStack(Material.CHAINMAIL_HELMET),1.4), new LootItem(new ItemStack(Material.CHAINMAIL_BOOTS),1.6), new LootItem(new ItemStack(Material.CHAINMAIL_CHESTPLATE),1.6),new LootItem(new ItemStack(Material.GOLD_BOOTS),2), new LootItem(new ItemStack(Material.GOLD_LEGGINGS),2), new LootItem(new ItemStack(Material.GOLD_CHESTPLATE),2),new LootItem(new ItemStack(Material.GOLD_HELMET),2),new LootItem(new ItemStack(Material.STICK),2), new LootItem(new ItemStack(Material.FEATHER),2), new LootItem(new ItemStack(Material.FLINT),2), new LootItem(new ItemStack(Material.WOOD_SWORD),2.5), new LootItem(new ItemStack(Material.STONE_AXE),3), new LootItem(new ItemStack(Material.LEATHER_CHESTPLATE),4)};
+        ItemStack specialGold = new ItemStack(Material.GOLD_INGOT);
+        specialGold.setAmount(5);
+        ItemMeta goldItemMeta = specialGold.getItemMeta();
+        goldItemMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "5 Gold");
+        specialGold.setItemMeta(goldItemMeta);
+        LootItem[] lootTable = {new LootItem(new ItemStack(Material.GOLDEN_APPLE),0.2), new LootItem(new ItemStack(Material.DIAMOND),0.3), new LootItem(new ItemStack(Material.IRON_INGOT),0.4),new LootItem(new ItemStack(Material.IRON_LEGGINGS),0.5),new LootItem(new ItemStack(Material.IRON_CHESTPLATE),0.5), new LootItem(new ItemStack(Material.EXP_BOTTLE,3),0.5), new LootItem(new ItemStack(Material.FISHING_ROD,1,s),0.75), new LootItem(new ItemStack(Material.IRON_BOOTS),0.6), new LootItem(new ItemStack(Material.STONE_SWORD),1), new LootItem(new ItemStack(Material.BOW),1.2), new LootItem(new ItemStack(Material.IRON_HELMET),1.2),new LootItem(new ItemStack(Material.COOKED_BEEF,3),1.2), new LootItem(new ItemStack(Material.CHAINMAIL_LEGGINGS),1.3), new LootItem(new ItemStack(Material.CHAINMAIL_HELMET),1.4), new LootItem(new ItemStack(Material.CHAINMAIL_BOOTS),1.6), new LootItem(new ItemStack(Material.CHAINMAIL_CHESTPLATE),1.6),new LootItem(new ItemStack(Material.GOLD_BOOTS),2), new LootItem(new ItemStack(Material.GOLD_LEGGINGS),2), new LootItem(new ItemStack(Material.GOLD_CHESTPLATE),2),new LootItem(new ItemStack(Material.GOLD_HELMET),2),new LootItem(new ItemStack(Material.STICK),2), new LootItem(new ItemStack(Material.FEATHER),2), new LootItem(new ItemStack(Material.FLINT),2), new LootItem(new ItemStack(Material.WOOD_SWORD),2.5), new LootItem(new ItemStack(Material.STONE_AXE),3), new LootItem(new ItemStack(Material.LEATHER_CHESTPLATE),4), new LootItem(specialGold,7)};
         Inventory inv = unr.getBlockInventory();
         for(int chestIndex = 0; chestIndex < 27; chestIndex++){
 

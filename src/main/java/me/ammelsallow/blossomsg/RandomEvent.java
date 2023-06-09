@@ -102,7 +102,7 @@ public class RandomEvent {
                     }
                     countDown = 16;
                     Bukkit.getScheduler().cancelTask(taskID);
-                    Location location = new Location(Bukkit.getWorld("sg4"), 0.5, 50, -2.5);
+                    Location location = game.getMap().getCenter().add(0,20,0);
                     ArmorStandNoClip asnc = new ArmorStandNoClip(((CraftWorld) location.getWorld()).getHandle());
                     drop = asnc.spawn(location);
                     drop.setHelmet(new ItemStack(Material.ENDER_CHEST));

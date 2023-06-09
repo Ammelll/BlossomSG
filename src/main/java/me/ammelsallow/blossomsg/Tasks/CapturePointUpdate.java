@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.*;
 
 import java.util.ArrayList;
@@ -22,12 +23,13 @@ public class    CapturePointUpdate extends BukkitRunnable {
 
     private HashMap<UUID,Double> playerPercents = new HashMap<>();
     private String capturePointStatus = "0.0";
-    private ArmorStand stand = (ArmorStand) Bukkit.getWorld("sg4").spawnEntity(new Location(Bukkit.getWorld("sg4"),0.5,28,-2.5),EntityType.ARMOR_STAND);
+    private ArmorStand stand;
     public CapturePointUpdate(Game g){
         this.game = g;
         for(Player p : game.getPlayers()) {
             playerPercents.put(p.getUniqueId(), 0.0);
         }
+        stand = (ArmorStand) game.getWorld().spawnEntity(new Location(game.getWorld(),game.getMap().getCenter().getX(),game.getWorld().getHighestBlockYAt(game.getMap().getCenter())-3,game.getMap().getCenter().getZ()),EntityType.ARMOR_STAND);
     }
     @Override
     public void run() {
@@ -36,7 +38,7 @@ public class    CapturePointUpdate extends BukkitRunnable {
         }
 
 
-        List<Entity> entitiesInBoundingBox = stand.getNearbyEntities(5,3,5);
+        List<Entity> entitiesInBoundingBox = stand.getNearbyEntities(10,5,10);
         ArrayList<Player> playersInBoundingBox = new ArrayList<>();
         ArrayList<Player> playersInCapturePoint = new ArrayList<>();
         for(Entity e : entitiesInBoundingBox){
@@ -51,7 +53,7 @@ public class    CapturePointUpdate extends BukkitRunnable {
             int xCoordinateCenter = (stand.getLocation().getBlockX());
             int zCoordinateCenter =  (stand.getLocation().getBlockZ());
 
-            if(Math.abs(xCoordinateCenter-xCoordinatePlayer) + Math.abs(zCoordinateCenter-zCoordinatePlayer) < 9){
+            if(Math.abs(xCoordinateCenter-xCoordinatePlayer) + Math.abs(zCoordinateCenter-zCoordinatePlayer) < 8){
                 playersInCapturePoint.add(p);
             }
         }
@@ -68,7 +70,7 @@ public class    CapturePointUpdate extends BukkitRunnable {
             }
         } else if(playersInCapturePoint.size() > 1){
             capturePointStatus = "Contested";
-        } else if(playersInCapturePoint.size() == 0){
+        } else {
             capturePointStatus = String.valueOf(getHighestScore());
         }
 
@@ -92,30 +94,36 @@ public class    CapturePointUpdate extends BukkitRunnable {
         p.setScoreboard(scoreboard);
     }
     public void updateScoreboard(Player p){
+        resetScoreboard(p);
+        setScoreboard(p);
+//        Scoreboard scoreboard = p.getScoreboard();
+//        Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+//        Score score;
+//        scoreboard.resetScores(ChatColor.AQUA + "Players " + ChatColor.DARK_GRAY + ">" + ChatColor.RESET + (game.getPlayerAmount()+1) + "");
+//        score = objective.getScore(ChatColor.AQUA + "Players " + ChatColor.DARK_GRAY + ">" + ChatColor.RESET + game.getPlayerAmount() + "");
+//        score.setScore(1);
+//        scoreboard.resetScores(ChatColor.AQUA + "Kills " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + (game.getKills(p)-1) + "");
+//        score = objective.getScore(ChatColor.AQUA + "Kills " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + game.getKills(p) + "");
+//        score.setScore(2);
+//        score = objective.getScore(ChatColor.AQUA + "Your Score " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + playerPercents.get(p.getUniqueId())+ "%");
+//        if(playerPercents.get(p.getUniqueId()) != null) {
+//            scoreboard.resetScores(ChatColor.AQUA + "Your Score " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + (playerPercents.get(p.getUniqueId())-1.5) + "%");
+//        }
+//        score.setScore(3);
+//        scoreboard.resetScores(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> "  + ChatColor.RESET + "Contested");
+//        scoreboard.resetScores(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET+ (getHighestScore()-1.5) + "%");
+//        scoreboard.resetScores(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET+ (getHighestScore()) + "%");
+//        if(capturePointStatus.equals("Contested")) {
+//            score = objective.getScore(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + capturePointStatus);
+//        } else{
+//            score = objective.getScore(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET+ capturePointStatus + "%");
+//        }
+//        score.setScore(4);
+//        p.setScoreboard(scoreboard);
+    }
+    public void resetScoreboard(Player p){
         Scoreboard scoreboard = p.getScoreboard();
-        Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
-        Score score;
-        scoreboard.resetScores(ChatColor.AQUA + "Players " + ChatColor.DARK_GRAY + ">" + ChatColor.RESET + (game.getPlayerAmount()+1) + "");
-        score = objective.getScore(ChatColor.AQUA + "Players " + ChatColor.DARK_GRAY + ">" + ChatColor.RESET + game.getPlayerAmount() + "");
-        score.setScore(1);
-        scoreboard.resetScores(ChatColor.AQUA + "Kills " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + (game.getKills(p)-1) + "");
-        score = objective.getScore(ChatColor.AQUA + "Kills " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + game.getKills(p) + "");
-        score.setScore(2);
-        score = objective.getScore(ChatColor.AQUA + "Your Score " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + playerPercents.get(p.getUniqueId())+ "%");
-        if(playerPercents.get(p.getUniqueId()) != null) {
-            scoreboard.resetScores(ChatColor.AQUA + "Your Score " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + (playerPercents.get(p.getUniqueId())-1.5) + "%");
-        }
-        score.setScore(3);
-        scoreboard.resetScores(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> "  + ChatColor.RESET + "Contested");
-        scoreboard.resetScores(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET+ (getHighestScore()-1.5) + "%");
-        scoreboard.resetScores(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET+ (getHighestScore()) + "%");
-        if(capturePointStatus.equals("Contested")) {
-            score = objective.getScore(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + capturePointStatus);
-        } else{
-            score = objective.getScore(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET+ capturePointStatus + "%");
-        }
-        score.setScore(4);
-        p.setScoreboard(scoreboard);
+        scoreboard.getEntries().forEach(scoreboard::resetScores);
     }
     private double getHighestScore(){
         Double highest = 0.0;

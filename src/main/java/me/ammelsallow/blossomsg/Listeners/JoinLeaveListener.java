@@ -34,6 +34,9 @@ public class JoinLeaveListener implements Listener {
     public void onPlayerLeave(PlayerQuitEvent event){
         Player p = event.getPlayer();
         if(p.getWorld().getName().equals("sg4")){
+            if(this.plugin.getEmptyGame() == null){
+                return;
+            }
             if(!this.plugin.getEmptyGame().getPlayers().contains(p)){
                 return;
             }

@@ -1,5 +1,6 @@
 package me.ammelsallow.blossomsg;
 
+import me.ammelsallow.blossomsg.Maps.SGMap;
 import me.ammelsallow.blossomsg.Model.PlayerStats;
 import me.ammelsallow.blossomsg.Tasks.CapturePointUpdate;
 import me.ammelsallow.blossomsg.Tasks.CheckForWinner;
@@ -20,40 +21,43 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class Game {
     int save;
     int savePVP;
     int taskID;
     RandomEvent randomEvent;
-    public String name;
+    private SGMap map;
     private boolean started;
     private HashMap<UUID,Integer> playerKills;
     private HashMap<UUID,Integer> playerDeaths;
     private HashMap<UUID,Integer> playerGold;
     private final static String sgPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "Blossom" + ChatColor.DARK_GRAY + "] ";
 
-    private int capacity;
     private BukkitTask capturePointUpdate;
     private ArrayList<Player> players;
-    private ArrayList<Player> startingPlayers;
+    private ArrayList<Player> startingPlayers = new ArrayList<>();
     private BlossomSG plugin;
-    public Game(BlossomSG _plugin, int _capacity, String name){
-        this.name = name;
+    public Game(BlossomSG _plugin, SGMap map){
+        this.map = map;
         plugin = _plugin;
-        capacity = _capacity;
         players = new ArrayList<>();
         playerKills = new HashMap<>();
+        playerDeaths = new HashMap<>();
+        playerGold = new HashMap<>();
         started = false;
         randomEvent = getRandomEvent((int) (Math.random() *3));
     }
 
     public int getCapacity(){
-        return capacity;
+        return map.getCapacity();
+    }
+    public SGMap getMap(){
+        return map;
+    }
+    public World getWorld(){
+        return map.getCenter().getWorld();
     }
     public int getPlayerAmount(){
         return players.size();
@@ -85,12 +89,12 @@ public class Game {
             playerDeaths.put(p.getUniqueId(),1);
         }
     }
-    public void addGold(Player p){
+    public void addGold(Player p, int goldAmount){
         if(playerGold.containsKey(p.getUniqueId())){
             int gold = playerGold.get(p.getUniqueId());
-            playerGold.put(p.getUniqueId(),gold+1);
+            playerGold.put(p.getUniqueId(),gold+goldAmount);
         } else{
-            playerGold.put(p.getUniqueId(),1);
+            playerGold.put(p.getUniqueId(),goldAmount);
         }
     }
     public int getKills(Player p){
@@ -101,10 +105,12 @@ public class Game {
     }
     public void join(Player player) {
         player.setGameMode(GameMode.SPECTATOR);
+        player.teleport(map.getCenter());
+        player.getInventory().clear();
         if (!started) {
             players.add(player);
             for (Player p : players) {
-                p.sendMessage(sgPrefix + ChatColor.AQUA + getPlayerAmount() + "/" + capacity + " players in queue");
+                p.sendMessage(sgPrefix + ChatColor.AQUA + getPlayerAmount() + "/" + getCapacity() + " players in queue");
             }
             if (getPlayerAmount() > 1) {
                 startCountdown();
@@ -116,7 +122,7 @@ public class Game {
             if (!started) {
                 players.remove(player);
                 for (Player p : players) {
-                    p.sendMessage(sgPrefix + ChatColor.AQUA + getPlayerAmount() + "/" + capacity + " players in queue");
+                    p.sendMessage(sgPrefix + ChatColor.AQUA + getPlayerAmount() + "/" + getCapacity() + " players in queue");
                 }
             }else{
                 players.remove(player);
@@ -208,7 +214,7 @@ public class Game {
                         for(Player p : players) {
                             p.sendMessage(  sgPrefix + ChatColor.GREEN + "" + ChatColor.BOLD +"The game has begun!");
 
-                            p.teleport(new Location(p.getWorld(),0,40,-3));
+                            p.teleport(map.getCenter());
                         }
                         Bukkit.getScheduler().cancelTask(save);
                         countDown = 10;
@@ -262,7 +268,6 @@ public class Game {
                 inventory.setItem(1,new ItemStack(Material.ARROW,5));
             }
         }
-        randomEvent.trigger();
         savePVP = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             int countDown = 32;
             @Override
@@ -314,7 +319,9 @@ public class Game {
                             }
                             countDown--;
                         } else {
-                            capturePointUpdate.cancel();
+                            if(capturePointUpdate != null) {
+                                capturePointUpdate.cancel();
+                            }
                             try {
                                 closeGame(winner);
                             } catch (SQLException e) {
@@ -328,24 +335,30 @@ public class Game {
             }
         }
         public void closeGame(Player winner) throws SQLException {
+        Bukkit.broadcastMessage("CLOSED GAME BEEP BOOP");
         //Update Database Stats
-            //TODO
+            Bukkit.broadcastMessage(startingPlayers.toString());
             for(Player player : startingPlayers){
                 if(playerKills.containsKey(player.getUniqueId())) {
                     PlayerStats pStats = getPlayerStatsFromDatabase(player);
                     pStats.setKills(pStats.getKills() + playerKills.get(player.getUniqueId()));
+                    Bukkit.broadcastMessage(playerKills.get(player.getUniqueId()) + "");
+                    this.plugin.getDatabased().updatePlayerStats(pStats);
                 }
                 if(playerDeaths.containsKey(player.getUniqueId())){
                     PlayerStats pStats = getPlayerStatsFromDatabase(player);
                     pStats.setDeaths(pStats.getDeaths() + playerDeaths.get(player.getUniqueId()));
+                    this.plugin.getDatabased().updatePlayerStats(pStats);
                 }
                 if(playerGold.containsKey(player.getUniqueId())){
                     PlayerStats pStats = getPlayerStatsFromDatabase(player);
                     pStats.setGold(pStats.getGold() + playerGold.get(player.getUniqueId()));
+                    this.plugin.getDatabased().updatePlayerStats(pStats);
                 }
             }
             PlayerStats winnerStats = getPlayerStatsFromDatabase(winner);
             winnerStats.setWins(winnerStats.getWins() +1);
+            this.plugin.getDatabased().updatePlayerStats(winnerStats);
             //Update Kills
 
             //Update Deaths
