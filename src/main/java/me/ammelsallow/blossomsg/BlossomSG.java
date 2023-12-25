@@ -1,23 +1,19 @@
 package me.ammelsallow.blossomsg;
 
-import me.ammelsallow.blossomsg.Commands.KitMenuCommand;
-import me.ammelsallow.blossomsg.Commands.giveCompass;
 import me.ammelsallow.blossomsg.DB.Database;
-import me.ammelsallow.blossomsg.Listeners.*;
-import me.ammelsallow.blossomsg.Mobs.ArmorStandNoClip;
-import me.ammelsallow.blossomsg.Tasks.CapturePointUpdate;
-import me.ammelsallow.blossomsg.Tasks.CheckForWinner;
-import me.ammelsallow.blossomsg.Tasks.UpdateTemporaryBlocks;
+import me.ammelsallow.blossomsg.Game.Game;
+import me.ammelsallow.blossomsg.Game.Mobs.ArmorStandNoClip;
+import me.ammelsallow.blossomsg.Game.Mobs.Frankenstein;
+import me.ammelsallow.blossomsg.Misc.NMSUtil;
+import me.ammelsallow.blossomsg.Misc.PluginUtil;
+import me.ammelsallow.blossomsg.Recipes.RecipeManager;
+import me.ammelsallow.blossomsg.WorldLoading.Maps.SGMap;
+import me.ammelsallow.blossomsg.WorldLoading.WorldLoader;
 import net.minecraft.server.v1_8_R3.EntityArmorStand;
+import net.minecraft.server.v1_8_R3.EntityIronGolem;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,27 +22,24 @@ public final class BlossomSG extends JavaPlugin {
 
     private ArrayList<Game> games = new ArrayList<>();
     private Database database;
-
+    private WorldLoader worldLoader;
     @Override
-    public void onEnable() {
-        // Plugin startup logic
+    public void onEnable(){
+        PluginUtil pluginUtil = new PluginUtil(this);
+        pluginUtil.init();
+
+        worldLoader = new WorldLoader(this);
+        for(SGMap sgMap : SGMap.getMapPool()){
+            System.out.println("MAP: " + sgMap.getCenter());
+            System.out.println(Bukkit.getWorld("Shire"));
+            worldLoader.delete(sgMap.getWorld());
+            worldLoader.load(sgMap.getName());
+        }
+        RecipeManager.addAllRecipes();
+
         NMSUtil nmsu = new NMSUtil();
         nmsu.registerEntity("ArmorStandNoClip", 30, EntityArmorStand.class, ArmorStandNoClip.class);
-        BukkitTask updateTemporaryBlocks = new UpdateTemporaryBlocks(this).runTaskTimer(this, 1L,1L);
-        BukkitTask checkForWinner = new CheckForWinner(this).runTaskTimer(this,1L,1L);
-        getCommand("compass").setExecutor(new giveCompass(this));
-        getCommand("kit").setExecutor(new KitMenuCommand());
-        getServer().getPluginManager().registerEvents(new ArmorStandInteractListener(),this);
-        getServer().getPluginManager().registerEvents(new JoinLeaveListener(this),this);
-        getServer().getPluginManager().registerEvents(new InteractListener(this),this);
-        getServer().getPluginManager().registerEvents(new MenuListener(this),this);
-        getServer().getPluginManager().registerEvents(new BlockPlaceListener(),this);
-//        getServer().getPluginManager().registerEvents(new ProjectileHitListener(),this);
-        getServer().getPluginManager().registerEvents(new PotionSplashListener(),this);
-        getServer().getPluginManager().registerEvents(new EntityDamageListener(),this);
-        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this),this);
-        getServer().getPluginManager().registerEvents(new BlockDestroyListener(),this);
-        getServer().getPluginManager().registerEvents(new ItemMergeListener(),this);
+        nmsu.registerEntity("Frankenstein", 99, EntityIronGolem.class, Frankenstein.class);
         try{
             this.database = new Database();
             database.initializeDatabase();
@@ -54,18 +47,20 @@ public final class BlossomSG extends JavaPlugin {
             e.printStackTrace();
             System.out.println("Unable to connect to DB and create tables");
         }
+
     }
-    public void onDisable(){
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
         this.database.closeConnection();
     }
     public Database getDatabased() {
         return database;
     }
-
     public ArrayList<Game> getGames(){
         return  games;
     }
-
     public Game getGame(Player p){
         for(Game game : games){
             if(game.getPlayers().contains(p)){
@@ -86,19 +81,11 @@ public final class BlossomSG extends JavaPlugin {
         }
         return null;
     }
+    public WorldLoader getWorldLoader(){
+        return worldLoader;
+    }
     public void removeGame(Game g){
         games.remove(g);
     }
 
-    public void openMainMenu(Player player){
-        Inventory inventory = Bukkit.createInventory(player,36, ChatColor.GOLD + "Game Selector");
-
-        ItemStack join = new ItemStack(Material.DIAMOND_SWORD);
-        ItemMeta joinMeta = join.getItemMeta();
-        joinMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "Join Blossom SG Queue");
-        join.setItemMeta(joinMeta);
-
-        inventory.setItem(12, join);
-        player.openInventory(inventory);
-    }
 }

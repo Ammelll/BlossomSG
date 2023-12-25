@@ -6,8 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="BlossomSG" />
+        <module name="BlossomSGFACTORED" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="BlossomSG" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
