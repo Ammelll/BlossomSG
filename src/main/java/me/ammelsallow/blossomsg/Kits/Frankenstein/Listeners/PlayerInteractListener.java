@@ -4,13 +4,7 @@ import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Game;
 import me.ammelsallow.blossomsg.Game.Mobs.Frankenstein;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
-import net.minecraft.server.v1_8_R3.WorldServer;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftIronGolem;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.SpawnEgg;
 
 import java.util.UUID;
 
@@ -33,7 +26,6 @@ public class PlayerInteractListener implements Listener {
     @EventHandler
     public void onPlayerInteraction(PlayerInteractEvent e){
         Player player = e.getPlayer();
-        player.getInventory().setItem(9,CustomItems.getFrankensteinEgg());
         if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
             if(e.getItem() != null && e.getItem().equals(CustomItems.getFrankensteinEgg())){
                 Frankenstein frankenstein = new Frankenstein(e.getClickedBlock().getLocation(),player,plugin);

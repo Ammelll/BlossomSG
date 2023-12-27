@@ -4,6 +4,7 @@ import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.DB.Model.PlayerStats;
 import me.ammelsallow.blossomsg.Game.Misc.RandomEvent;
 import me.ammelsallow.blossomsg.Game.Tasks.CapturePointUpdate;
+import me.ammelsallow.blossomsg.Kits.Kit;
 import me.ammelsallow.blossomsg.Kits.Misc.PlayerKitSelection;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
 import me.ammelsallow.blossomsg.WorldLoading.Maps.SGMap;
@@ -261,28 +262,15 @@ public class Game {
             inventory.clear();
             p.getInventory().setArmorContents(null);
             if(PlayerKitSelection.selectedKit.containsKey(p.getUniqueId())){
-                switch (PlayerKitSelection.selectedKit.get(p.getUniqueId())){
-                    case "ender":
-                        inventory.setItem(0, CustomItems.getEndermanEnderheart());
-                        inventory.setItem(1,CustomItems.getEndermanBlocks());
-                        break;
-                    case "robin":
-
-                        inventory.setItem(0,CustomItems.getRobinhoodBow());
-                        inventory.setItem(1,new ItemStack(Material.ARROW,5));
-                        break;
-                    case "nether":
-
-                        inventory.setItem(0,CustomItems.getNethermageAxe());
-                        inventory.setItem(1,CustomItems.getNethermagePotions());
-                        break;
-                    case "lumber":
-                        inventory.setItem(0,CustomItems.getLumberjackAxe());
-                        break;
-                    case "frank":
-                        inventory.setItem(0,CustomItems.getFrankensteinEgg());
-                        inventory.setItem(1,CustomItems.getFrankensteinRoses());
-                }
+                 String stringID = PlayerKitSelection.selectedKit.get(p.getUniqueId());
+                 for(int i = 0; i < BlossomSG.KITS.length; i++){
+                     Kit kit = BlossomSG.KITS[i];
+                     if(stringID.equals(kit.stringID)) {
+                         for (int j = 0; j < kit.items.length; j++) {
+                             inventory.setItem(j, kit.items[j]);
+                         }
+                     }
+                 }
             }
             else{
                 p.sendMessage(sgPrefix + ChatColor.RED + "No kit selecting, defaulting to robinhood");

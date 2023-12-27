@@ -1,6 +1,8 @@
 package me.ammelsallow.blossomsg.Game.Commands;
 
+import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Listeners.KitSelectorMenuListener;
+import me.ammelsallow.blossomsg.Kits.Kit;
 import me.ammelsallow.blossomsg.Kits.Misc.PlayerKitSelection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,6 +22,8 @@ import java.util.List;
 public class KitMenuCommand implements CommandExecutor {
 
 
+
+    //!! This class is not very DRY
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player p = (Player) commandSender;
@@ -29,6 +33,7 @@ public class KitMenuCommand implements CommandExecutor {
         addNethermageKit(menu);
         addLumberjackKit(menu);
         addFrankensteinKit(menu);
+        addCaptainKit(menu);
         loadSelectedKit(p, menu);
         p.openInventory(menu);
         return true;
@@ -43,7 +48,7 @@ public class KitMenuCommand implements CommandExecutor {
         emanMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         emanMeta.setLore(emanLore);
         emanKit.setItemMeta(emanMeta);
-        menu.setItem(3,emanKit);
+        menu.setItem(0,emanKit);
     }
     public void addRobinhoodKit(Inventory menu){
         ItemStack robinKit = new ItemStack(Material.BOW);
@@ -55,7 +60,7 @@ public class KitMenuCommand implements CommandExecutor {
         robinMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         robinMeta.setLore(robinLore);
         robinKit.setItemMeta(robinMeta);
-        menu.setItem(4,robinKit);
+        menu.setItem(1,robinKit);
     }
     public void addNethermageKit(Inventory menu){
         ItemStack netherKit = new ItemStack(Material.FIREBALL);
@@ -67,7 +72,7 @@ public class KitMenuCommand implements CommandExecutor {
         netherMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         netherMeta.setLore(netherLore);
         netherKit.setItemMeta(netherMeta);
-        menu.setItem(5,netherKit);
+        menu.setItem(2,netherKit);
     }
     public void addLumberjackKit(Inventory menu){
         ItemStack lumberKit = new ItemStack(Material.DIAMOND_AXE);
@@ -79,7 +84,7 @@ public class KitMenuCommand implements CommandExecutor {
         lumberMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         lumberMeta.setLore(lumberLore);
         lumberKit.setItemMeta(lumberMeta);
-        menu.setItem(6,lumberKit);
+        menu.setItem(3,lumberKit);
     }
     public void addFrankensteinKit(Inventory menu){
         ItemStack frankKit = new ItemStack(Material.RED_ROSE);
@@ -92,28 +97,29 @@ public class KitMenuCommand implements CommandExecutor {
         frankMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         frankMeta.setLore(frankLore);
         frankKit.setItemMeta(frankMeta);
-        menu.setItem(7,frankKit);
-
+        menu.setItem(4,frankKit);
+    }
+    public void addCaptainKit(Inventory menu){
+        ItemStack captKit = new ItemStack(Material.BOAT);
+        ItemMeta capMeta = captKit.getItemMeta();
+        List<String> capLore = new ArrayList<>();
+        capLore.add(ChatColor.WHITE + "" + ChatColor.ITALIC + "Fishing Rod : 6 Uses");
+        capLore.add(ChatColor.WHITE + "" + ChatColor.ITALIC + "Boat 5x");
+        capMeta.setLore(capLore);
+        capMeta.setDisplayName(ChatColor.BLUE + "" + ChatColor.BOLD + "Captain");
+        capMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        capMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        captKit.setItemMeta(capMeta);
+        menu.setItem(5,captKit);
     }
     public void loadSelectedKit(Player p, Inventory menu){
         if(PlayerKitSelection.selectedKit.containsKey(p.getUniqueId())){
-            String kit = PlayerKitSelection.selectedKit.get(p.getUniqueId());
-            switch (kit){
-                case "ender":
-                    menu.setItem(3, KitSelectorMenuListener.addGlow(menu,3));
-                    break;
-                case "robin":
-                    menu.setItem(4,KitSelectorMenuListener.addGlow(menu,4));
-                    break;
-                case "nether":
-                    menu.setItem(5,KitSelectorMenuListener.addGlow(menu,5));
-                    break;
-                case "lumber":
-                    menu.setItem(6,KitSelectorMenuListener.addGlow(menu,6));
-                    break;
-                case "frank":
-                    menu.setItem(7,KitSelectorMenuListener.addGlow(menu,7));
-                    break;
+            String stringID = PlayerKitSelection.selectedKit.get(p.getUniqueId());
+            for(int i = 0; i < BlossomSG.KITS.length; i++){
+                Kit kit = BlossomSG.KITS[i];
+                if(stringID.equals(kit.stringID)){
+                    menu.setItem(i,KitSelectorMenuListener.addGlow(menu,i));
+                }
             }
         }
 
