@@ -140,4 +140,32 @@ public class CustomItems {
         boats.setItemMeta(boatMeta);
         return boats;
     }
+    public static ItemStack getShepherdCrook(){
+        ItemStack crook = new ItemStack(Material.WOOD_HOE);
+        ItemMeta crookMeta = crook.getItemMeta();
+        crookMeta.setDisplayName(ChatColor.WHITE + "" + ChatColor.BOLD + "Shepherd's Crook");
+        crookMeta.addEnchant(Enchantment.DAMAGE_ALL,4,true);
+        crook.setItemMeta(crookMeta);
+        return crook;
+    }
+    public static ItemStack getShepherdEggs(){
+        ItemStack eggs = new ItemStack(Material.MONSTER_EGG,3,(short) 91);
+        ItemMeta eggMeta = eggs.getItemMeta();
+        eggMeta.setDisplayName(ChatColor.WHITE + "Sheep Spawn Egg");
+        List<String> eggLore = new ArrayList<>();
+        eggLore.add("While alive and in close proximity regenerates Shepherd 0.5 hearts every 4 seconds");
+        eggMeta.setLore(eggLore);
+        eggs.setItemMeta(eggMeta);
+        return eggs;
+    }
+    public static ItemStack getShepherdWheat(){
+        ItemStack wheat = new ItemStack(Material.WHEAT,5);
+        ItemMeta wheatMeta = wheat.getItemMeta();
+        wheatMeta.setDisplayName(ChatColor.GOLD + "Wheat");
+        List<String> wheatLore = new ArrayList<>();
+        wheatLore.add("Feed to sheep to gain temporary regeneration");
+        wheatMeta.setLore(wheatLore);
+        wheat.setItemMeta(wheatMeta);
+        return wheat;
+    }
 }

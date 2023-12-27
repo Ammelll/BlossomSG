@@ -34,6 +34,7 @@ public class KitMenuCommand implements CommandExecutor {
         addLumberjackKit(menu);
         addFrankensteinKit(menu);
         addCaptainKit(menu);
+        addShepherdKit(menu);
         loadSelectedKit(p, menu);
         p.openInventory(menu);
         return true;
@@ -111,6 +112,16 @@ public class KitMenuCommand implements CommandExecutor {
         capMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         captKit.setItemMeta(capMeta);
         menu.setItem(5,captKit);
+    }
+    public void addShepherdKit(Inventory menu){
+        ItemStack shepKit = new ItemStack(Material.WHEAT);
+        ItemMeta shepMeta = shepKit.getItemMeta();
+        List<String> shepLore = new ArrayList<>();
+        shepLore.add("Silent night, holy night...");
+        shepMeta.setLore(shepLore);
+        shepMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Shepherd");
+        shepKit.setItemMeta(shepMeta);
+        menu.setItem(6,shepKit);
     }
     public void loadSelectedKit(Player p, Inventory menu){
         if(PlayerKitSelection.selectedKit.containsKey(p.getUniqueId())){

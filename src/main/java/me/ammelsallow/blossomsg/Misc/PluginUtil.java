@@ -5,7 +5,7 @@ import me.ammelsallow.blossomsg.Game.Commands.KitMenuCommand;
 import me.ammelsallow.blossomsg.Game.Commands.giveCompass;
 import me.ammelsallow.blossomsg.Game.Listeners.*;
 import me.ammelsallow.blossomsg.Game.Tasks.CheckForWinner;
-import me.ammelsallow.blossomsg.Kits.Captain.Listeners.EntityMountListener;
+import me.ammelsallow.blossomsg.Kits.Captain.Listeners.PlayerDamageListener;
 import me.ammelsallow.blossomsg.Kits.Enderman.Listeners.BlockPlaceListener;
 import me.ammelsallow.blossomsg.Kits.Enderman.Listeners.InteractListener;
 import me.ammelsallow.blossomsg.Kits.Enderman.Tasks.UpdateTemporaryBlocks;
@@ -27,6 +27,7 @@ public class PluginUtil {
         //Kits
 
         plugin.getServer().getPluginManager().registerEvents(new EntityTargetPlayerListener(plugin),plugin);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerDamageListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new BlockPlaceListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new InteractListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new PlayerInteractListener(plugin),plugin);
@@ -34,7 +35,6 @@ public class PluginUtil {
         plugin.getServer().getPluginManager().registerEvents(new PrepareItemCraftListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new EntityDamageListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new PotionSplashListener(),plugin);
-        plugin.getServer().getPluginManager().registerEvents(new EntityMountListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new me.ammelsallow.blossomsg.Kits.Robinhood.Listeners.EntityDamageListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new me.ammelsallow.blossomsg.Kits.Robinhood.Listeners.InteractListener(),plugin);
 

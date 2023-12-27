@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class    CapturePointUpdate extends BukkitRunnable {
+public class CapturePointUpdate extends BukkitRunnable {
 
     private Game game;
 
@@ -35,7 +35,6 @@ public class    CapturePointUpdate extends BukkitRunnable {
         for(Player p : game.getPlayers()) {
             updateScoreboard(p);
         }
-
 
         List<Entity> entitiesInBoundingBox = stand.getNearbyEntities(10,10,10);
         ArrayList<Player> playersInBoundingBox = new ArrayList<>();

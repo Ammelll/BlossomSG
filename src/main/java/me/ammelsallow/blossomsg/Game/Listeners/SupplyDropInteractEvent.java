@@ -51,7 +51,7 @@ public class SupplyDropInteractEvent implements Listener {
 
                 ItemStack chestplate = new ItemStack(Material.IRON_CHESTPLATE);
                 ItemStack leggings = new ItemStack(Material.IRON_LEGGINGS);
-                ItemStack potion = new Potion(PotionType.SPEED).toItemStack(1);
+                ItemStack potion = new Potion(PotionType.SPEED,2).toItemStack(1);
                 PotionMeta potionMeta = (PotionMeta) potion.getItemMeta();
                 potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 400, 0), true);
                 potion.setItemMeta(potionMeta);
