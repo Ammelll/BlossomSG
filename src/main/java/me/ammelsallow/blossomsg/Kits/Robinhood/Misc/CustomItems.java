@@ -121,4 +121,23 @@ public class CustomItems {
         roses.setItemMeta(roseMeta);
         return roses;
     }
+    public static ItemStack getCaptainRod(){
+        ItemStack rod = new ItemStack(Material.FISHING_ROD,1,(short) 58);
+        ItemMeta rodMeta = rod.getItemMeta();
+        rodMeta.setDisplayName(ChatColor.BLUE + "" + ChatColor.BOLD + "Captain's Rod");
+        List<String> rodLore = new ArrayList<>();
+        rodLore.add(ChatColor.GREEN + "There's still some seaweed on it...");
+        rodMeta.setLore(rodLore);
+        rod.setItemMeta(rodMeta);
+        return rod;
+    }
+    public static ItemStack getCaptainBoats(){
+        ItemStack boats = new ItemStack(Material.BOAT, 5);
+        ItemMeta boatMeta = boats.getItemMeta();
+        List<String> boatLore = new ArrayList<>();
+        boatLore.add(ChatColor.LIGHT_PURPLE + "Captain regenerates while sailing!");
+        boatMeta.setLore(boatLore);
+        boats.setItemMeta(boatMeta);
+        return boats;
+    }
 }

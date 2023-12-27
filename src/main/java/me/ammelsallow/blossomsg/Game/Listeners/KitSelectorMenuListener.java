@@ -2,17 +2,16 @@ package me.ammelsallow.blossomsg.Game.Listeners;
 
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Game;
+import me.ammelsallow.blossomsg.Kits.Kit;
 import me.ammelsallow.blossomsg.Kits.Misc.PlayerKitSelection;
 import me.ammelsallow.blossomsg.WorldLoading.Maps.SGMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,32 +34,13 @@ public class KitSelectorMenuListener implements Listener {
             if(e.getCurrentItem() == null){
                 return;
             }
-            if(e.getCurrentItem().getType() == Material.ENDER_PEARL){
-                inventory.setItem(3,addGlow(inventory,3));
-                Player p = (Player) e.getWhoClicked();
-                PlayerKitSelection.selectedKit.put(p.getUniqueId(), "ender");
-
-            }
-            else if(e.getCurrentItem().getType() == Material.BOW){
-                inventory.setItem(4,addGlow(inventory,4));
-                Player p = (Player) e.getWhoClicked();
-                PlayerKitSelection.selectedKit.put(p.getUniqueId(), "robin");
-
-            }
-            else if(e.getCurrentItem().getType() == Material.FIREBALL){
-                inventory.setItem(5,addGlow(inventory,5));
-                Player p = (Player) e.getWhoClicked();
-                PlayerKitSelection.selectedKit.put(p.getUniqueId(), "nether");
-            }
-            else if(e.getCurrentItem().getType() == Material.DIAMOND_AXE){
-                inventory.setItem(6,addGlow(inventory,6));
-                Player p = (Player) e.getWhoClicked();
-                PlayerKitSelection.selectedKit.put(p.getUniqueId(),"lumber");
-            }
-            else if(e.getCurrentItem().getType() == Material.RED_ROSE){
-                inventory.setItem(7,addGlow(inventory,7));
-                Player p = (Player) e.getWhoClicked();
-                PlayerKitSelection.selectedKit.put(p.getUniqueId(),"frank");
+            for(int i = 0; i < BlossomSG.KITS.length; i++){
+                Kit kit = BlossomSG.KITS[i];
+                if(e.getCurrentItem().getType() == kit.material){
+                    inventory.setItem(i,addGlow(inventory,i));
+                    Player p = (Player) e.getWhoClicked();
+                    PlayerKitSelection.selectedKit.put(p.getUniqueId(), kit.stringID);
+                }
             }
 
         } else if(e.getClickedInventory().getTitle().equalsIgnoreCase(MAIN_MENU)){

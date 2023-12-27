@@ -2,7 +2,6 @@ package me.ammelsallow.blossomsg.Game.Commands;
 
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Mobs.ArmorStandNoClip;
-import me.ammelsallow.blossomsg.Kits.Misc.PlayerKitSelection;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.*;
@@ -15,14 +14,11 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
 
 public class giveCompass implements CommandExecutor {
     int save;
