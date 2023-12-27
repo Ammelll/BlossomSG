@@ -10,15 +10,13 @@ import org.bukkit.scoreboard.Scoreboard;
 public abstract class GameScoreboardHandler {
 
 
-    public static final void setScoreboard(Player p, int countdown, String title, boolean keep, boolean reset) {
+    public static final void setScoreboard(Player p, int countdown, String title, boolean keep) {
         Scoreboard scoreboard = p.getScoreboard();
         Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
         Score score;
         String timeConverted = convertTimeFormat(countdown);
         score = objective.getScore(ChatColor.AQUA + title + ChatColor.RESET + timeConverted);
-        if (reset) {
-            scoreboard.resetScores(ChatColor.AQUA + title + ChatColor.RESET + convertTimeFormat(countdown + 1));
-        }
+        scoreboard.resetScores(ChatColor.AQUA + title + ChatColor.RESET + convertTimeFormat(countdown + 1));
         if (keep) {
             score.setScore(6);
         }

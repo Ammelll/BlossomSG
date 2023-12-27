@@ -14,7 +14,7 @@ public class CheckForWinner extends BukkitRunnable {
     public void run() {
         for(Game g : plugin.getGames()){
             if(g.getPlayerAmount() == 1 && g.getStarted()){
-                g.end(g.getPlayers().get(0));
+                g.getGameCloseHandler().end(g.getPlayers().get(0));
                 break;
             }
         }

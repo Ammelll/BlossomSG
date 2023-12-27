@@ -61,7 +61,8 @@ public class CapturePointUpdate extends BukkitRunnable {
                 double percent = playerPercents.get(increaser.getUniqueId());
                 percent +=1.5;
                 if(percent >= 100){
-                    game.end(increaser);
+                    System.out.println(game.getGameCloseHandler());
+                    game.getGameCloseHandler().end(increaser);
                     increaser.sendMessage("INCREASED");
                 }
                 playerPercents.put(increaser.getUniqueId(),percent);

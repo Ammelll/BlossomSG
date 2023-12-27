@@ -23,15 +23,12 @@
 //import org.bukkit.potion.PotionEffect;
 //import org.bukkit.potion.PotionEffectType;
 //import org.bukkit.scheduler.BukkitTask;
-//import org.bukkit.scoreboard.DisplaySlot;
-//import org.bukkit.scoreboard.Objective;
-//import org.bukkit.scoreboard.Score;
-//import org.bukkit.scoreboard.Scoreboard;
+//
 //
 //import java.sql.SQLException;
 //import java.util.*;
 ////I'm puking...
-//public class Jame {
+//public class Game {
 //    int save;
 //    int savePVP;
 //    int taskID;
@@ -50,7 +47,7 @@
 //    private ArrayList<Player> players;
 //    private ArrayList<Player> startingPlayers = new ArrayList<>();
 //    private BlossomSG plugin;
-//    public Jame(BlossomSG _plugin, SGMap map){
+//    public Game(BlossomSG _plugin, SGMap map){
 //        this.map = map;
 //        plugin = _plugin;
 //        players = new ArrayList<>();
@@ -125,69 +122,9 @@
 //        }
 //        return null;
 //    }
-//    public void join(Player player) {
-//        player.setGameMode(GameMode.SPECTATOR);
-//        player.teleport(map.getCenter());
-//        player.getInventory().clear();
-//        if (!started) {
-//            players.add(player);
-//            for (Player p : players) {
-//                p.sendMessage(sgPrefix + ChatColor.AQUA + getPlayerAmount() + "/" + getCapacity() + " players in queue");
-//            }
-//            if (getPlayerAmount() > 1 && !queueStarted) {
-//                queueStarted = true;
-//                startCountdown();
-//            }
-//        }
-//    }
-//    public void leave(Player player){
-//        if(players.contains(player)) {
-//            if (!started) {
-//                players.remove(player);
-//                for (Player p : players) {
-//                    p.sendMessage(sgPrefix + ChatColor.AQUA + getPlayerAmount() + "/" + getCapacity() + " players in queue");
-//                }
-//            }else{
-//                players.remove(player);
-//            }
-//        }
-//    }
-//
-//    public void startCountdown(){
-//        save = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-//            int countDown = 10;
-//            @Override
-//            public void run() {
 //
 //
-//                if (getPlayerAmount()  < 2) {
-//                    Bukkit.getScheduler().cancelTask(save);
-//                    for(Player p : players) {
-//                        p.sendMessage(sgPrefix + ChatColor.DARK_RED + "Start canceled, not enough players!");
-//                        return;
-//                    }
-//                }
-//                if(countDown > 1){
-//                    countDown--;
-//                    for(Player p : Bukkit.getOnlinePlayers()) {
-//                        p.sendMessage(sgPrefix + ChatColor.WHITE + "The game will begin in " + ChatColor.RED + "" + ChatColor.BOLD + countDown + ChatColor.RESET+ " seconds!");
-//                    }
-//                } else{
-//                    for(Player p : players) {
-//                        p.sendMessage(  sgPrefix + ChatColor.GREEN + "" + ChatColor.BOLD +"The game has begun!");
 //
-//                        p.teleport(map.getCenter());
-//                    }
-//                    Bukkit.getScheduler().cancelTask(save);
-//                    countDown = 10;
-//                    startGame();
-//                    started = true;
-//                }
-//            }
-//        },20,20);
-//
-//
-//    }
 //    public void startGame(){
 //        capture = new CapturePointUpdate(this);
 //        checkVehicleTask = new CheckVehicleTask(this);
@@ -236,12 +173,12 @@
 //                if(countDown > 1){
 //                    countDown--;
 //                    for(Player p : players){
-//                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP: ",true,true);
+//                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP Enabled ",true);
 //                    }
 //                } else{
 //                    for(Player p : Bukkit.getOnlinePlayers()) {
 //                        p.sendMessage(  sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD +"The grace period is over!");
-//                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP: ",false,true);
+//                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP Enabled ",false);
 //                    }
 //                    randomEventStartTimer();
 //                    Bukkit.getScheduler().cancelTask(savePVP);
@@ -352,14 +289,14 @@
 //                    countDown--;
 //                    for(Player p : players){
 //
-//                        GameScoreboardHandler.setScoreboard(p,countDown,"Random Event: ",true,true);
+//                        GameScoreboardHandler.setScoreboard(p,countDown,"Random Event ",true);
 //
 //
 //                    }
 //                } else{
 //                    for(Player p : Bukkit.getOnlinePlayers()) {
 //                        p.sendMessage(  sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD +"The grace period is over!");
-//                        GameScoreboardHandler.setScoreboard(p,countDown,"Random Event: ",false,true);
+//                        GameScoreboardHandler.setScoreboard(p,countDown,"Random Event ",false);
 //                    }
 //                    countDown = 62;
 //                    randomEvent.trigger();

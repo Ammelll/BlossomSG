@@ -3,6 +3,7 @@ package me.ammelsallow.blossomsg.Game.Misc;
 
 import me.ammelsallow.blossomsg.Game.Game;
 import me.ammelsallow.blossomsg.Game.Mobs.ArmorStandNoClip;
+import me.ammelsallow.blossomsg.Game.Testing.GameScoreboardHandler;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -85,12 +86,12 @@ public class RandomEvent {
                 if(countDown > 1){
                     countDown--;
                     for(Player p : game.getPlayers()){
-                        p.sendMessage(Game.getSGPrefix() + ChatColor.RESET +"A supply drop is dropping in " +ChatColor.RED + "" +ChatColor.BOLD + countDown + ChatColor.RESET + " seconds");
+                        p.sendMessage(Game.sgPrefix + ChatColor.RESET +"A supply drop is dropping in " +ChatColor.RED + "" +ChatColor.BOLD + countDown + ChatColor.RESET + " seconds");
                     }
 
                 } else{
                     for(Player p : game.getPlayers()){
-                        p.sendMessage(Game.getSGPrefix() + ChatColor.RESET + "A supply drop has spawned over the"  + ChatColor.AQUA + "" + ChatColor.BOLD +" Capture Point");
+                        p.sendMessage(Game.sgPrefix + ChatColor.RESET + "A supply drop has spawned over the"  + ChatColor.AQUA + "" + ChatColor.BOLD +" Capture Point");
                     }
                     countDown = 16;
                     Bukkit.getScheduler().cancelTask(taskID);
@@ -142,5 +143,29 @@ public class RandomEvent {
         payday = CraftItemStack.asBukkitCopy(NMSpayday);
         payday.setItemMeta(paydayMeta);
         return payday;
+    }
+    public void start() {
+        taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
+            int countDown = 62;
+
+            @Override
+            public void run() {
+                if (countDown > 1) {
+                    countDown--;
+                    for (Player p : game.getPlayers()) {
+                        GameScoreboardHandler.setScoreboard(p, countDown, "Random Event ", true);
+                    }
+                } else {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.sendMessage(Game.sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD + "The grace period is over!");
+                        GameScoreboardHandler.setScoreboard(p, countDown, "Random Event ", false);
+                    }
+                    countDown = 62;
+                    trigger();
+                    Bukkit.getScheduler().cancelTask(taskID);
+                    game.getGameMatchHandler().startCapturePoint();
+                }
+            }
+        }, 6L, 20L);
     }
 }

@@ -41,7 +41,7 @@ public class PlayerDeathListener implements Listener {
             plugin.getGame(p).addDeath(p);
         }
         for(Game g : plugin.getGames()){
-            g.leave(p);
+            g.getGameQueueHandler().leave(p);
         }
 
     }

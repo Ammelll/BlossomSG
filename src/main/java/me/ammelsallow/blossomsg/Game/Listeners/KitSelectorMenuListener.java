@@ -49,12 +49,12 @@ public class KitSelectorMenuListener implements Listener {
                 case DIAMOND_SWORD:
                     if(plugin.getEmptyGame() != null){
                         System.out.println(plugin.getEmptyGame().getMap().getName());
-                        plugin.getEmptyGame().join(player);
+                        plugin.getEmptyGame().getGameQueueHandler().join(player);
                     } else{
                         Game game = new Game(plugin, SGMap.randomFrommPool());
                         plugin.addGame(game);
                         System.out.println("else " + game.getMap().getName());
-                        game.join(player);
+                        game.getGameQueueHandler().join(player);
                     }
                     break;
             }

@@ -40,7 +40,7 @@ public class JoinLeaveListener implements Listener {
             if(!this.plugin.getEmptyGame().getPlayers().contains(p)){
                 return;
             }
-            this.plugin.getEmptyGame().leave(p);
+            this.plugin.getEmptyGame().getGameQueueHandler().leave(p);
         }
     }
 }
