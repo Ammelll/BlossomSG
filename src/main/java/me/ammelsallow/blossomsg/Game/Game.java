@@ -4,6 +4,8 @@ import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.DB.Model.PlayerStats;
 import me.ammelsallow.blossomsg.Game.Misc.RandomEvent;
 import me.ammelsallow.blossomsg.Game.Tasks.CapturePointUpdate;
+import me.ammelsallow.blossomsg.Game.Testing.GameScoreboardHandler;
+import me.ammelsallow.blossomsg.Kits.Captain.Tasks.CheckVehicleTask;
 import me.ammelsallow.blossomsg.Kits.Kit;
 import me.ammelsallow.blossomsg.Kits.Misc.PlayerKitSelection;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
@@ -28,7 +30,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.sql.SQLException;
 import java.util.*;
-
+//I'm puking...
 public class Game {
     int save;
     int savePVP;
@@ -36,12 +38,15 @@ public class Game {
     RandomEvent randomEvent;
     private SGMap map;
     private boolean started;
+    private boolean queueStarted;
     private Map<UUID,Integer> playerKills;
     private Map<UUID,Integer> playerDeaths;
     private Map<UUID,Integer> playerGold;
     private Map<UUID,UUID> mobMap;
     private final static String sgPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "Blossom" + ChatColor.DARK_GRAY + "] ";
     private BukkitTask capturePointUpdate;
+    private BukkitTask vehicleUpdate;
+    private CheckVehicleTask checkVehicleTask;
     private ArrayList<Player> players;
     private ArrayList<Player> startingPlayers = new ArrayList<>();
     private BlossomSG plugin;
@@ -54,6 +59,7 @@ public class Game {
         playerGold = new HashMap<>();
         mobMap = new HashMap<>();
         started = false;
+        queueStarted = false;
         randomEvent = getRandomEvent((int) (Math.random() *3));
     }
 
@@ -128,7 +134,8 @@ public class Game {
             for (Player p : players) {
                 p.sendMessage(sgPrefix + ChatColor.AQUA + getPlayerAmount() + "/" + getCapacity() + " players in queue");
             }
-            if (getPlayerAmount() > 1) {
+            if (getPlayerAmount() > 1 && !queueStarted) {
+                queueStarted = true;
                 startCountdown();
             }
         }
@@ -146,67 +153,6 @@ public class Game {
         }
     }
 
-    public void setScoreboardPvP(Player p, int countdown){
-        Scoreboard scoreboard = p.getScoreboard();
-        Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
-        Score score;
-        score = objective.getScore(ChatColor.AQUA + "PVP Enabled " + ChatColor.RESET + "0:" + countdown);
-    }
-    public void updateScoreboardPvP(Player p, int countdown){
-        Scoreboard scoreboard = p.getScoreboard();
-        Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
-        Score score;
-        score = objective.getScore(ChatColor.AQUA + "PVP Enabled " + ChatColor.RESET  + "0:"+ countdown);
-        scoreboard.resetScores(ChatColor.AQUA + "PVP Enabled " + ChatColor.RESET +"0:"+  (countdown+1));
-        if(countdown < 10){
-            score = objective.getScore(ChatColor.AQUA + "PVP Enabled " + ChatColor.RESET  + "0:0"+ countdown);
-            scoreboard.resetScores(ChatColor.AQUA + "PVP Enabled " + ChatColor.RESET +"0:0"+  (countdown+1));
-        }
-        score.setScore(6);
-    }
-    public void endScoreboardPvP(Player p){
-        Scoreboard scoreboard = p.getScoreboard();
-        scoreboard.resetScores(ChatColor.AQUA + "PVP Enabled " + ChatColor.RESET + "0:0"+ 0);
-    }
-
-    public void setScoreboardRandomEvent(Player p, int countdown){
-        Scoreboard scoreboard = p.getScoreboard();
-        Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
-        Score score;
-        if((double) countdown / 60 >= 1){
-            score = objective.getScore(ChatColor.AQUA + "Random Event " + ChatColor.RESET + "1:0"+ (countdown % 60));
-        } else{
-            score = objective.getScore(ChatColor.AQUA + "Random Event " +ChatColor.RESET + "0:" + countdown);
-        }
-        score.setScore(6);
-    }
-    public void updateScoreboardRandomEvent(Player p, int countdown){
-        Scoreboard scoreboard = p.getScoreboard();
-        Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
-        Score score;
-        if((double) countdown / 60 >= 1){
-            score = objective.getScore(ChatColor.AQUA + "Random Event " + ChatColor.RESET + "1:0" + (countdown % 60));
-            scoreboard.resetScores(ChatColor.AQUA + "Random Event " + ChatColor.RESET + "1:0" +  ((countdown+1) % 60));
-        } else {
-            score = objective.getScore(ChatColor.AQUA + "Random Event " + ChatColor.RESET + "0:" + (countdown % 60));
-            if(countdown % 60 + 1 == 60){
-                scoreboard.resetScores(ChatColor.AQUA + "Random Event " + ChatColor.RESET + "1:0" + ((countdown+1) % 60));
-            } else {
-                scoreboard.resetScores(ChatColor.AQUA + "Random Event " +ChatColor.RESET + "0:"+ ((countdown+1) % 60));
-            }
-            if(countdown < 10){
-                score = objective.getScore(ChatColor.AQUA + "Random Event " + ChatColor.RESET + "0:0" + (countdown % 60));
-                scoreboard.resetScores(ChatColor.AQUA + "Random Event " +ChatColor.RESET + "0:"+ ((countdown) % 60));
-                scoreboard.resetScores(ChatColor.AQUA + "Random Event " +ChatColor.RESET + "0:0"+ ((countdown+1) % 60));
-            }
-        }
-
-        score.setScore(6);
-    }
-    public void endScoreboardRandomEvent(Player p){
-        Scoreboard scoreboard = p.getScoreboard();
-        scoreboard.resetScores(ChatColor.AQUA + "Random Event " +ChatColor.RESET + "0:00");
-    }
     public void startCountdown(){
         save = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             int countDown = 10;
@@ -244,6 +190,8 @@ public class Game {
     }
     public void startGame(){
         capture = new CapturePointUpdate(this);
+        checkVehicleTask = new CheckVehicleTask(this);
+        vehicleUpdate = checkVehicleTask.runTaskTimer(plugin,0,20);
         Inventory inventory;
         for(Player p : players){
             p.setHealth(20.0);
@@ -255,22 +203,22 @@ public class Game {
             p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,630,4));
             p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS,630,4));
             p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,630,4));
-            p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,630,1));
+            p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1000000,1));
             p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION,630,1));
             p.setGameMode(GameMode.SURVIVAL);
             inventory = p.getInventory();
             inventory.clear();
             p.getInventory().setArmorContents(null);
             if(PlayerKitSelection.selectedKit.containsKey(p.getUniqueId())){
-                 String stringID = PlayerKitSelection.selectedKit.get(p.getUniqueId());
-                 for(int i = 0; i < BlossomSG.KITS.length; i++){
-                     Kit kit = BlossomSG.KITS[i];
-                     if(stringID.equals(kit.stringID)) {
-                         for (int j = 0; j < kit.items.length; j++) {
-                             inventory.setItem(j, kit.items[j]);
-                         }
-                     }
-                 }
+                String stringID = PlayerKitSelection.selectedKit.get(p.getUniqueId());
+                for(int i = 0; i < BlossomSG.KITS.length; i++){
+                    Kit kit = BlossomSG.KITS[i];
+                    if(stringID.equals(kit.stringID)) {
+                        for (int j = 0; j < kit.items.length; j++) {
+                            inventory.setItem(j, kit.items[j]);
+                        }
+                    }
+                }
             }
             else{
                 p.sendMessage(sgPrefix + ChatColor.RED + "No kit selecting, defaulting to robinhood");
@@ -288,18 +236,12 @@ public class Game {
                 if(countDown > 1){
                     countDown--;
                     for(Player p : players){
-
-                        Scoreboard scoreboard = p.getScoreboard();
-                        setScoreboardPvP(p,countDown-1);
-                        updateScoreboardPvP(p,countDown-1);
-
-
-
+                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP: ",true,true);
                     }
                 } else{
                     for(Player p : Bukkit.getOnlinePlayers()) {
                         p.sendMessage(  sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD +"The grace period is over!");
-                        endScoreboardPvP(p);
+                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP: ",false,true);
                     }
                     randomEventStartTimer();
                     Bukkit.getScheduler().cancelTask(savePVP);
@@ -311,6 +253,7 @@ public class Game {
 
 
     public void end(Player winner) {
+        vehicleUpdate.cancel();
         if (started) {
             started = false;
             PlayerConnection connection = ((CraftPlayer) winner.getPlayer()).getHandle().playerConnection;
@@ -346,12 +289,11 @@ public class Game {
                 }
             }, 20, 20);
         }
+        players.clear();
     }
     public void closeGame(Player winner) throws SQLException {
-        Bukkit.broadcastMessage("CLOSED GAME BEEP BOOP");
         plugin.getWorldLoader().rebuild(getWorld());
         //Update Database Stats
-        Bukkit.broadcastMessage(startingPlayers.toString());
         for(Player player : startingPlayers){
             if(playerKills.containsKey(player.getUniqueId())) {
                 PlayerStats pStats = getPlayerStatsFromDatabase(player);
@@ -399,8 +341,6 @@ public class Game {
             p.teleport(new Location(Bukkit.getWorld("world"),0,150,0));
             p.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The game has ended and you have been sent back to the lobby!");
         }
-        players.clear();
-        System.out.println(players);
     }
     public void randomEventStartTimer(){
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
@@ -412,16 +352,14 @@ public class Game {
                     countDown--;
                     for(Player p : players){
 
-                        setScoreboardRandomEvent(p,countDown-1);
-                        updateScoreboardRandomEvent(p,countDown-1);
-
+                        GameScoreboardHandler.setScoreboard(p,countDown,"Random Event: ",true,true);
 
 
                     }
                 } else{
                     for(Player p : Bukkit.getOnlinePlayers()) {
                         p.sendMessage(  sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD +"The grace period is over!");
-                        endScoreboardRandomEvent(p);
+                        GameScoreboardHandler.setScoreboard(p,countDown,"Random Event: ",false,true);
                     }
                     countDown = 62;
                     randomEvent.trigger();
