@@ -23,7 +23,7 @@ public class JoinLeaveListener implements Listener {
         Player player = e.getPlayer();
         World world = player.getWorld();
         if(world.getName().equals("world")) {
-            Location location = new Location(world, 0.5, 150, 0.5);
+            Location location = new Location(world, 14.5, 108 ,24.5);
             player.teleport(location);
             Inventory inventory = player.getInventory();
             inventory.clear();

@@ -3,7 +3,7 @@ package me.ammelsallow.blossomsg.Game.Misc;
 
 import me.ammelsallow.blossomsg.Game.Game;
 import me.ammelsallow.blossomsg.Game.Mobs.ArmorStandNoClip;
-import me.ammelsallow.blossomsg.Game.Testing.GameScoreboardHandler;
+import me.ammelsallow.blossomsg.Game.GameHelpers.GameScoreboardHandler;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -148,22 +148,23 @@ public class RandomEvent {
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
             int countDown = 62;
 
+
             @Override
             public void run() {
                 if (countDown > 1) {
                     countDown--;
                     for (Player p : game.getPlayers()) {
-                        GameScoreboardHandler.setScoreboard(p, countDown, "Random Event ", true);
+                        GameScoreboardHandler.setScoreboard(p, countDown, "Random Event ", true,7);
                     }
                 } else {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         p.sendMessage(Game.sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD + "The grace period is over!");
-                        GameScoreboardHandler.setScoreboard(p, countDown, "Random Event ", false);
+                        GameScoreboardHandler.setScoreboard(p, countDown, "Random Event ", false,7);
                     }
                     countDown = 62;
-                    trigger();
                     Bukkit.getScheduler().cancelTask(taskID);
                     game.getGameMatchHandler().startCapturePoint();
+                    trigger();
                 }
             }
         }, 6L, 20L);

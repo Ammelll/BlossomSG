@@ -15,6 +15,9 @@ import me.ammelsallow.blossomsg.Kits.Lumberjack.Listeners.EntityTargetPlayerList
 import me.ammelsallow.blossomsg.Kits.Lumberjack.Listeners.PrepareItemCraftListener;
 import me.ammelsallow.blossomsg.Kits.Nethermage.Listeners.EntityDamageListener;
 import me.ammelsallow.blossomsg.Kits.Nethermage.Listeners.PotionSplashListener;
+import me.ammelsallow.blossomsg.Kits.Shepherd.Listeners.EntityFeedListener;
+import me.ammelsallow.blossomsg.Kits.Shepherd.Listeners.PlayerInteractListenerShepherd;
+import me.ammelsallow.blossomsg.Kits.Shepherd.Tasks.ShepherdProximityTask;
 import org.bukkit.scheduler.BukkitTask;
 
 
@@ -35,6 +38,8 @@ public class PluginUtil {
         plugin.getServer().getPluginManager().registerEvents(new PrepareItemCraftListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new EntityDamageListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new PotionSplashListener(),plugin);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerInteractListenerShepherd(plugin),plugin);
+        plugin.getServer().getPluginManager().registerEvents(new EntityFeedListener(plugin),plugin);
         plugin.getServer().getPluginManager().registerEvents(new me.ammelsallow.blossomsg.Kits.Robinhood.Listeners.EntityDamageListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new me.ammelsallow.blossomsg.Kits.Robinhood.Listeners.InteractListener(),plugin);
 

@@ -29,6 +29,9 @@ public class KitSelectorMenuListener implements Listener {
         if(e.getClickedInventory() == null){
             return;
         }
+        if(e.getCurrentItem() == null){
+            return;
+        }
         if(e.getInventory().getTitle().equalsIgnoreCase(ChatColor.BLACK + "" + ChatColor.BOLD + "Kit Selector")) {
             e.setCancelled(true);
             if(e.getCurrentItem() == null){
@@ -45,6 +48,7 @@ public class KitSelectorMenuListener implements Listener {
 
         } else if(e.getClickedInventory().getTitle().equalsIgnoreCase(MAIN_MENU)){
             Player player = (Player) e.getWhoClicked();
+
             switch(e.getCurrentItem().getType()){
                 case DIAMOND_SWORD:
                     if(plugin.getEmptyGame() != null){

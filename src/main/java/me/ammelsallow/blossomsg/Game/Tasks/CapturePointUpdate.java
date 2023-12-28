@@ -83,11 +83,13 @@ public class CapturePointUpdate extends BukkitRunnable {
         objective.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Blossom");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         ArrayList<Score> scores = new ArrayList<>();
+        scores.add(objective.getScore(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "blossomsg.net"));
+        scores.add(objective.getScore(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "                     "));
         scores.add(objective.getScore(ChatColor.AQUA + "Players " + ChatColor.DARK_GRAY + ">" + ChatColor.RESET + game.getPlayerAmount() + ""));
         scores.add(objective.getScore(ChatColor.AQUA + "Kills " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + game.getKills(p) + ""));
         scores.add(objective.getScore(ChatColor.AQUA + "Your Score " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + playerPercents.get(p.getUniqueId())+ "%"));
         scores.add(objective.getScore(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + capturePointStatus + "%"));
-        scores.add(objective.getScore(""));
+
         for(int i = 0; i < scores.size(); i++){
             scores.get(i).setScore(i);
         }

@@ -21,7 +21,7 @@ public class EntityTargetPlayerListener implements Listener {
             Player p = (Player) e.getTarget();
             Game g = plugin.getGame(p);
             if(g != null){
-                if(e.getEntity().getUniqueId() == g.getMob(p.getUniqueId())){
+                if(g.getMob(p.getUniqueId()) != null && g.getMob(p.getUniqueId()).contains(e.getEntity().getUniqueId())){
                     e.setCancelled(true);
                 }
             }

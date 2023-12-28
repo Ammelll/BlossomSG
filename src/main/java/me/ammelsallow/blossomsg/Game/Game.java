@@ -4,28 +4,12 @@ import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.DB.Model.PlayerStats;
 import me.ammelsallow.blossomsg.Game.Misc.RandomEvent;
 import me.ammelsallow.blossomsg.Game.Tasks.CapturePointUpdate;
-import me.ammelsallow.blossomsg.Game.Testing.GameCloseHandler;
-import me.ammelsallow.blossomsg.Game.Testing.GameMatchHandler;
-import me.ammelsallow.blossomsg.Game.Testing.GameQueueHandler;
-import me.ammelsallow.blossomsg.Game.Testing.GameScoreboardHandler;
-import me.ammelsallow.blossomsg.Kits.Captain.Tasks.CheckVehicleTask;
-import me.ammelsallow.blossomsg.Kits.Kit;
-import me.ammelsallow.blossomsg.Kits.Misc.PlayerKitSelection;
-import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
+import me.ammelsallow.blossomsg.Game.GameHelpers.GameCloseHandler;
+import me.ammelsallow.blossomsg.Game.GameHelpers.GameMatchHandler;
+import me.ammelsallow.blossomsg.Game.GameHelpers.GameQueueHandler;
 import me.ammelsallow.blossomsg.WorldLoading.Maps.SGMap;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitTask;
 
 
 import java.sql.SQLException;
@@ -38,7 +22,7 @@ public class Game {
     private Map<UUID,Integer> playerKills;
     private Map<UUID,Integer> playerDeaths;
     private Map<UUID,Integer> playerGold;
-    private Map<UUID,UUID> mobMap;
+    private Map<UUID,List<UUID>> mobMap;
     public final static String sgPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "Blossom" + ChatColor.DARK_GRAY + "] ";
 
     private ArrayList<Player> players;
@@ -56,7 +40,8 @@ public class Game {
         playerGold = new HashMap<>();
         mobMap = new HashMap<>();
         started = false;
-        randomEvent = generateRandomEvent((int) (Math.random() *3));
+        //Always supply drop
+        randomEvent = generateRandomEvent((int) (Math.random() * 3 * 0));
         this.gqh = new GameQueueHandler(this);
         this.gmh = new GameMatchHandler(this);
         this.gmc = new GameCloseHandler(this);
@@ -135,7 +120,7 @@ public class Game {
         }
     }
     public void addMob(UUID playerUUID, UUID mobUUID){
-        this.mobMap.put(playerUUID,mobUUID);
+        this.mobMap.put(playerUUID,Arrays.asList(mobUUID));
     }
     public void addDeath(Player p){
         if(playerDeaths.containsKey(p.getUniqueId())){
@@ -159,16 +144,19 @@ public class Game {
         }
         return 0;
     }
-    public UUID getMob(UUID playerUUID){
+    public List<UUID> getMob(UUID playerUUID){
         if(mobMap.containsKey(playerUUID)){
             return mobMap.get(playerUUID);
         }
         return null;
     }
+    public Map<UUID,List<UUID>> getMobMap(){
+        return mobMap;
+    }
     public Map<UUID,Integer> getPlayerKills(){
         return playerKills;
     }
-    
+
     public BlossomSG getPlugin() {
         return plugin;
     }

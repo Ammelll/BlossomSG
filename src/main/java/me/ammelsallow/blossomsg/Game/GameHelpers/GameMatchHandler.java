@@ -1,4 +1,4 @@
-package me.ammelsallow.blossomsg.Game.Testing;
+package me.ammelsallow.blossomsg.Game.GameHelpers;
 
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Game;
@@ -6,17 +6,17 @@ import me.ammelsallow.blossomsg.Game.Tasks.CapturePointUpdate;
 import me.ammelsallow.blossomsg.Kits.Captain.Tasks.CheckVehicleTask;
 import me.ammelsallow.blossomsg.Kits.Kit;
 import me.ammelsallow.blossomsg.Kits.Misc.PlayerKitSelection;
-import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
+import me.ammelsallow.blossomsg.Kits.Shepherd.Tasks.ShepherdProximityTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.HashMap;
 
 public class GameMatchHandler {
     private Game game;
@@ -24,6 +24,8 @@ public class GameMatchHandler {
     private BukkitTask captureUpdate;
     private CheckVehicleTask vehicle;
     private BukkitTask vehicleUpdate;
+    private ShepherdProximityTask sheep;
+    private BukkitTask sheepUpdate;
     private int savePVP;
     public GameMatchHandler(Game game){
         this.game = game;
@@ -35,7 +37,9 @@ public class GameMatchHandler {
     private void initTasks(){
         capture = new CapturePointUpdate(game);
         vehicle = new CheckVehicleTask(game);
+        sheep = new ShepherdProximityTask(game);
         vehicleUpdate = vehicle.runTaskTimer(game.getPlugin(),0,20);
+        sheepUpdate = sheep.runTaskTimer(game.getPlugin(),0,80);
         initSavePVP();
     }
     private void initSavePVP(){
@@ -43,17 +47,19 @@ public class GameMatchHandler {
             int countDown = 32;
             @Override
             public void run() {
+
                 if(countDown > 1){
                     countDown--;
                     for(Player p : game.getPlayers()){
-                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP Enabled ",true);
+                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP Enabled ",true,6);
                     }
                 } else{
                     for(Player p : Bukkit.getOnlinePlayers()) {
                         p.sendMessage(Game.sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD +"The grace period is over!");
-                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP Enabled ",false);
+                        GameScoreboardHandler.setScoreboard(p,countDown,"PVP Enabled ",false,6);
                     }
                     game.getRandomEvent().start();
+                    System.out.println("STARTING");
                     Bukkit.getScheduler().cancelTask(savePVP);
                     countDown = 32;
                 }
@@ -116,8 +122,11 @@ public class GameMatchHandler {
     }
     public void cancelVehicle(){
         vehicle.cancel();
+        sheep.cancel();
     }
     public void cancelCapture(){
-        capture.cancel();
+        if(captureUpdate != null) {
+            capture.cancel();
+        }
     }
 }

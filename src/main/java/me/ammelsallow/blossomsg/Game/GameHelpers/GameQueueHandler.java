@@ -1,4 +1,4 @@
-package me.ammelsallow.blossomsg.Game.Testing;
+package me.ammelsallow.blossomsg.Game.GameHelpers;
 
 import me.ammelsallow.blossomsg.Game.Game;
 import org.bukkit.Bukkit;

@@ -94,7 +94,7 @@ public class SupplyDropInteractEvent implements Listener {
                         playerCount.getAndIncrement();
                     }
                 });
-                for (int i = 0; i < playerCount.get() * 3; i++) {
+                for (int i = 0; i < playerCount.get() * 4; i++) {
                     int random = (int) (Math.random() * itemLocations.size());
                     blockWorld.dropItem(itemLocations.get(random).getLocation(), itemLocations.get(random).getItemStack());
                 }

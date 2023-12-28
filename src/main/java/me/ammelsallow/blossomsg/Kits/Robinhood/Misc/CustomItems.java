@@ -144,6 +144,9 @@ public class CustomItems {
         ItemStack crook = new ItemStack(Material.WOOD_HOE);
         ItemMeta crookMeta = crook.getItemMeta();
         crookMeta.setDisplayName(ChatColor.WHITE + "" + ChatColor.BOLD + "Shepherd's Crook");
+        List<String> crookLore = new ArrayList<>();
+        crookLore.add(ChatColor.DARK_PURPLE + "Silent night, holy night...");
+        crookMeta.setLore(crookLore);
         crookMeta.addEnchant(Enchantment.DAMAGE_ALL,4,true);
         crook.setItemMeta(crookMeta);
         return crook;

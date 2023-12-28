@@ -2,18 +2,24 @@ package me.ammelsallow.blossomsg.Game.Listeners;
 
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Game;
+import me.ammelsallow.blossomsg.Kits.Kit;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 public class PlayerDeathListener implements Listener {
 
@@ -42,6 +48,18 @@ public class PlayerDeathListener implements Listener {
         }
         for(Game g : plugin.getGames()){
             g.getGameQueueHandler().leave(p);
+        }
+        List<ItemStack> drops = e.getDrops();
+        for(int i = 0; i < drops.size(); i++){
+            ItemStack drop = drops.get(i);
+            for(Kit kit : BlossomSG.KITS){
+                for(ItemStack item : kit.items){
+                    if(item.equals(drop) && item.getType() != Material.ARROW){
+                        drops.remove(drop);
+                        i--;
+                    }
+                }
+            }
         }
 
     }

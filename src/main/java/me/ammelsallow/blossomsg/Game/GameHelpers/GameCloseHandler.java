@@ -1,8 +1,8 @@
-package me.ammelsallow.blossomsg.Game.Testing;
+package me.ammelsallow.blossomsg.Game.GameHelpers;
 
-import me.ammelsallow.blossomsg.DB.Model.PlayerStats;
 import me.ammelsallow.blossomsg.Game.Game;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
+import me.ammelsallow.blossomsg.WorldLoading.WorldLoader;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
@@ -25,8 +25,8 @@ public class GameCloseHandler {
         this.game = game;
     }
     public void end(Player winner) {
+        game.setStarted(false);
         this.winner = winner;
-        endComponents();
         celebration();
         startLobbyCloseTask();
         try {
@@ -36,35 +36,74 @@ public class GameCloseHandler {
         }
     }
     private void startLobbyCloseTask(){
+        System.out.println("NEW LOBBY CLOSE TASK");
         save = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
             int countDown = 5;
-
             @Override
             public void run() {
-                if (countDown > 0) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
+                if(countDown > 0){
+                    countDown--;
+                    for(Player p : game.getPlayers()){
                         p.sendMessage(Game.sgPrefix + ChatColor.WHITE + "The lobby will close in " + ChatColor.RED + "" + ChatColor.BOLD + countDown + ChatColor.RESET + " seconds!");
                     }
-                    countDown--;
-                } else {
+                } else{
+                    Bukkit.getScheduler().cancelTask(save);
+                    countDown = 5;
                     game.getGameMatchHandler().cancelCapture();
                     try {
                         closeGame();
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                    Bukkit.getScheduler().cancelTask(save);
+                    endComponents();
                 }
-
             }
-        }, 20, 20);
+        },20L,20L);
+
+//    int countdown = 5;
+//    @Override
+//    public void run() {
+//        if(countdown > 0){
+//            for (Player p : game.getPlayers()){
+//                p.sendMessage(Game.sgPrefix + ChatColor.WHITE + "The lobby will close in " + ChatColor.RED + "" + ChatColor.BOLD + countdown + ChatColor.RESET + " seconds!");
+//            }
+//            countdown--;
+//        } else{
+//            Bukkit.getScheduler().cancelTask(save);
+//        }
+//    }
+//        save = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
+//            int countDown = 5;
+//
+//            @Override
+//            public void run() {
+//                System.out.println(save);
+//                if (countDown > 0) {
+//                    for (Player p : Bukkit.getOnlinePlayers()) {
+//                        p.sendMessage(Game.sgPrefix + ChatColor.WHITE + "The lobby will close in " + ChatColor.RED + "" + ChatColor.BOLD + countDown + ChatColor.RESET + " seconds!");
+//                    }
+//                    countDown--;
+//                } else {
+//                    System.out.println("CANCELLING");
+//                    Bukkit.getScheduler().cancelTask(save);
+//
+//                    game.getGameMatchHandler().cancelCapture();
+//                    try {
+//                        closeGame();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                    endComponents();
+//                }
+//
+//            }
+//        }, 20, 20);
     }
 
 
     private void endComponents(){
         game.getGameMatchHandler().cancelVehicle();
         game.getPlayers().clear();
-        game.setStarted(false);
     }
     private void celebration(){
         PlayerConnection connection = ((CraftPlayer) winner.getPlayer()).getHandle().playerConnection;
@@ -80,22 +119,28 @@ public class GameCloseHandler {
         return winner;
     }
     private void closeGame() throws SQLException {
-        prepGame();
         prepPlayers();
+        prepGame();
     }
 
     private void prepGame() {
-        game.getPlugin().getWorldLoader().rebuild(game.getWorld());
         game.getPlugin().removeGame(game);
         game.getPlayerKills().clear();
         game.getPlayers().clear();
         game.getGameQueueHandler().getStartingPlayers().clear();
-    }
+        try {
+            WorldLoader.rebuild(game.getWorld());
+        }catch(Exception e){
+            System.out.println("FAILED");
+        }
+        }
 
     private void prepPlayers(){
+        System.out.println(game.getPlayers());
         for(Player p : game.getPlayers()){
             prepAttributes(p);
             prepInventory(p);
+            GameScoreboardHandler.resetScoreboard(p);
             sendToLobby(p);
         }
     }
@@ -118,5 +163,6 @@ public class GameCloseHandler {
         i.setBoots(null);
         i.clear();
         i.setItem(0, CustomItems.getCompassSelector());
+        Bukkit.broadcastMessage("PREPPED");
     }
 }

@@ -11,8 +11,12 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Frankenstein extends EntityIronGolem {
     private Player player;
@@ -53,11 +57,21 @@ public class Frankenstein extends EntityIronGolem {
             if(world.getNearbyEntities(currentLocation,10,10,10).stream().filter(e -> e instanceof Player).count() == 0){
                 return;
             }
-            Player targetPlayer = (Player) world.getNearbyEntities(currentLocation,10,10,10).stream().filter(e -> e instanceof Player).findFirst().get();
-            if(frankenstein.getUniqueID() == g.getMob(targetPlayer.getUniqueId())){
-                return;
+            List<Entity> nearByPlayers = world.getNearbyEntities(currentLocation,10,10,10).stream().filter(e -> e instanceof Player).collect(Collectors.toList());
+            System.out.println(g.getMobMap() + " MOB MAP");
+            for(Entity e : nearByPlayers){
+                Player targetPlayer = (Player) e;
+//                if(g.getMobMap().get(targetPlayer.getUniqueId()).get(0) == frankenstein.getUniqueID()){
+//
+//                }
+                System.out.println("NEW GOAL");
+                System.out.println(targetPlayer.getUniqueId());
+                System.out.println(frankenstein.getUniqueID() + " FRANKENSTEIN ID");
+                System.out.println(targetPlayer.getName() + " " + targetPlayer.getUniqueId() + " NAME AND ID");
+                frankenstein.setGoalTarget((EntityLiving) ((CraftPlayer) targetPlayer).getHandle(), EntityTargetEvent.TargetReason.CUSTOM, true);
             }
-            frankenstein.setGoalTarget((EntityLiving) ((CraftPlayer) targetPlayer).getHandle(), EntityTargetEvent.TargetReason.CUSTOM, true);
+
         }
     }
 }
+
