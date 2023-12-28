@@ -89,6 +89,7 @@ public class GameCloseHandler {
         game.getPlugin().removeGame(game);
         game.getPlayerKills().clear();
         game.getPlayers().clear();
+        game.getGameQueueHandler().getStartingPlayers().clear();
     }
 
     private void prepPlayers(){
@@ -105,7 +106,7 @@ public class GameCloseHandler {
     }
 
     private void sendToLobby(Player p) {
-        p.teleport(new Location(Bukkit.getWorld("world"),0,150,0));
+        p.teleport(new Location(Bukkit.getWorld("world"),14.5 ,108 ,24.5));
         p.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The game has ended and you have been sent back to the lobby!");
     }
 
