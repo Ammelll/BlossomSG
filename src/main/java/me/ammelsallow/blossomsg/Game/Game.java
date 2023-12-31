@@ -41,7 +41,7 @@ public class Game {
         mobMap = new HashMap<>();
         started = false;
         //Always supply drop
-        randomEvent = generateRandomEvent((int) (Math.random() * 3 * 0));
+        randomEvent = generateRandomEvent((int) (Math.random() * 3));
         this.gqh = new GameQueueHandler(this);
         this.gmh = new GameMatchHandler(this);
         this.gmc = new GameCloseHandler(this);

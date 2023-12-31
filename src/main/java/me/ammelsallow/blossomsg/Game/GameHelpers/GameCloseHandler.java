@@ -151,7 +151,8 @@ public class GameCloseHandler {
     }
 
     private void sendToLobby(Player p) {
-        p.teleport(new Location(Bukkit.getWorld("world"),14.5 ,108 ,24.5));
+        //14.5 ,108 ,24.5
+        p.teleport(new Location(Bukkit.getWorld("world"),-144.5,71,272.5));
         p.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The game has ended and you have been sent back to the lobby!");
     }
 
