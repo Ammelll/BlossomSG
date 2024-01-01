@@ -33,6 +33,7 @@ public final class BlossomSG extends JavaPlugin {
     private WorldLoader worldLoader;
     @Override
     public void onEnable(){
+        System.out.println("NEW VERSION");
         PluginUtil pluginUtil = new PluginUtil(this);
         pluginUtil.init();
 

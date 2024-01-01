@@ -35,6 +35,9 @@ public class GameQueueHandler {
     }
     private void prepPlayer(Player p){
         p.setGameMode(GameMode.SPECTATOR);
+        System.out.println(game);
+        System.out.println(game.getMap());
+        System.out.println(game.getMap().getCenter());
         p.teleport(game.getMap().getCenter());
         p.getInventory().clear();
     }

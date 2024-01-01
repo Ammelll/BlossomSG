@@ -10,4 +10,5 @@ me/ammelsallow/blossomsg/Game/GameHelpers/GameMatchHandler$1.class
 me/ammelsallow/blossomsg/Kits/Cooldown.class
 me/ammelsallow/blossomsg/Kits/Shepherd/Listeners/EntityFeedListener.class
 me/ammelsallow/blossomsg/Game/GameHelpers/GameMatchHandler.class
+me/ammelsallow/blossomsg/Game/Listeners/PlayerJoinListener.class
 me/ammelsallow/blossomsg/Game/GameHelpers/GameCloseHandler$1.class

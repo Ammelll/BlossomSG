@@ -1,6 +1,7 @@
 /home/ammel/Coding Projects/MC/Plugins/BlossomSG/src/main/java/me/ammelsallow/blossomsg/Maps/SGMap.java
 /home/ammel/Coding Projects/MC/Plugins/BlossomSG/src/main/java/me/ammelsallow/blossomsg/Game/Listeners/KitSelectorMenuListener.java
 /home/ammel/Coding Projects/MC/Plugins/BlossomSG/src/main/java/me/ammelsallow/blossomsg/Kits/Enderman/Misc/TempBlock.java
+/home/ammel/Coding Projects/MC/Plugins/BlossomSG/src/main/java/me/ammelsallow/blossomsg/Game/Listeners/PlayerJoinListener.java
 /home/ammel/Coding Projects/MC/Plugins/BlossomSG/src/main/java/me/ammelsallow/blossomsg/Recipes/RecipeManager.java
 /home/ammel/Coding Projects/MC/Plugins/BlossomSG/src/main/java/me/ammelsallow/blossomsg/Kits/Lumberjack/Listeners/BlockBreakListener.java
 /home/ammel/Coding Projects/MC/Plugins/BlossomSG/src/main/java/me/ammelsallow/blossomsg/Kits/Kit.java

@@ -27,9 +27,10 @@ public class PluginUtil {
         this.plugin= plugin;
     }
     public void init(){
-        //Kits
+        //Kitsy
 
         plugin.getServer().getPluginManager().registerEvents(new EntityTargetPlayerListener(plugin),plugin);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerJoinListener(plugin),plugin);
         plugin.getServer().getPluginManager().registerEvents(new PlayerDamageListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new BlockPlaceListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new InteractListener(),plugin);
