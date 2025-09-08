@@ -30,18 +30,18 @@ public final class BlossomSG extends JavaPlugin {
     public static final Kit[] KITS = {new Kit(Material.ENDER_PEARL,"ender",new ItemStack[]{CustomItems.getEndermanEnderheart(),CustomItems.getEndermanBlocks()}),new Kit(Material.BOW,"robin",new ItemStack[]{CustomItems.getRobinhoodBow(),new ItemStack(Material.ARROW,5)}),new Kit(Material.FIREBALL,"nether", new ItemStack[]{CustomItems.getNethermageAxe(), CustomItems.getNethermagePotions()}), new Kit(Material.DIAMOND_AXE, "lumber", new ItemStack[]{CustomItems.getLumberjackAxe()}), new Kit(Material.RED_ROSE,"frank", new ItemStack[]{CustomItems.getFrankensteinEgg(),CustomItems.getFrankensteinRoses()}), new Kit(Material.BOAT,"cap", new ItemStack[]{CustomItems.getCaptainRod(),CustomItems.getCaptainBoats()}), new Kit(Material.WHEAT,"shep",new ItemStack[]{CustomItems.getShepherdCrook(),CustomItems.getShepherdEggs(),CustomItems.getShepherdWheat()})};
     private ArrayList<Game> games = new ArrayList<>();
     private Database database;
-    private WorldLoader worldLoader;
     @Override
     public void onEnable(){
         PluginUtil pluginUtil = new PluginUtil(this);
         pluginUtil.init();
+        WorldLoader.setPlugin(this);
 
-        worldLoader = new WorldLoader(this);
         for(SGMap sgMap : SGMap.getMapPool()){
             System.out.println("MAP: " + sgMap.getCenter());
-            System.out.println(Bukkit.getWorld("Shire"));
-            worldLoader.delete(sgMap.getWorld());
-            worldLoader.load(sgMap.getName());
+            System.out.println(sgMap.getWorld());
+            if(sgMap.getWorld() == null){
+                WorldLoader.rebuild(sgMap.getWorld());
+            }
         }
         RecipeManager.addAllRecipes();
 
@@ -88,9 +88,6 @@ public final class BlossomSG extends JavaPlugin {
             }
         }
         return null;
-    }
-    public WorldLoader getWorldLoader(){
-        return worldLoader;
     }
     public void removeGame(Game g){
         games.remove(g);

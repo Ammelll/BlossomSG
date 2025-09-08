@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class SGMap {
 
-    private static ArrayList<SGMap> mapPool = new ArrayList<>(Arrays.asList(new ShireMap(), new SG4Map()));
+    private static final ArrayList<SGMap> mapPool = new ArrayList<>(Arrays.asList(new SG4Map()));
 
     public Location center;
     public int capacity;

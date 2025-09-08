@@ -15,9 +15,10 @@ public class WorldLoader {
 
     private static BlossomSG plugin;
 
-    public WorldLoader(BlossomSG plugin){
-        this.plugin = plugin;
+    public static void setPlugin(BlossomSG plugin) {
+        WorldLoader.plugin = plugin;
     }
+
     public static void rebuild(World world) {
         String worldName = world.getName();
         delete(world);
@@ -70,11 +71,11 @@ public class WorldLoader {
 
     public static void unload(World world) {
 //        String Name = world.getName();
-        if (!world.equals(null)) {
+        if (world != null) {
             for (Player p : world.getPlayers()) {
                 p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
             }
-            Bukkit.getServer().unloadWorld(world, true);
+            Bukkit.getServer().unloadWorld(world, false);
         }
     }
 }

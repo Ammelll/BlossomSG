@@ -5,7 +5,7 @@ import org.bukkit.World;
 
 public class SGMap {
 
-    private static final SGMap[] mapPool = {new ShireMap(), new SG4Map(), new WildWestMap()};
+    private static final SGMap[] mapPool = {new SG4Map()};
 
     public Location center;
     public int capacity;

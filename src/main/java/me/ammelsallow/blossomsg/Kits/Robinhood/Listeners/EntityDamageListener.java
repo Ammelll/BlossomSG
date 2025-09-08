@@ -13,15 +13,20 @@ public class EntityDamageListener implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent e) {
-        if (e.getDamager() instanceof Projectile) {
-            Projectile shot = (Projectile) e.getDamager();
-            if (shot instanceof Projectile) {
-                Player shooter = (Player) shot.getShooter();
-                if (e.getEntity() instanceof Player) {
-                    if (PlayerKitSelection.selectedKit.get(shooter.getUniqueId()) != null && PlayerKitSelection.selectedKit.get(shooter.getUniqueId()).equals("robin")) {
-                        shooter.getInventory().addItem(new ItemStack(Material.ARROW));
-                    }
-                }
+        if (!(e.getDamager() instanceof Projectile)) {
+            return;
+        }
+        Projectile shot = (Projectile) e.getDamager();
+        if (shot == null) {
+            return;
+        }
+        if (!(shot.getShooter() instanceof Player)) {
+            return;
+        }
+        Player shooter = (Player) shot.getShooter();
+        if (e.getEntity() instanceof Player) {
+            if (PlayerKitSelection.selectedKit.get(shooter.getUniqueId()) != null && PlayerKitSelection.selectedKit.get(shooter.getUniqueId()).equals("robin")) {
+                shooter.getInventory().addItem(new ItemStack(Material.ARROW));
             }
         }
     }

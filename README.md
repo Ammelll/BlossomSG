@@ -5,4 +5,4 @@ Feel free to contribute!
 
 Discord is ammel, https://discord.gg/pSAa5RBD
 
-(Except WorldLoader class, credit https://www.spigotmc.org/threads/resetting-a-world.243492/)
+(WorldLoader class modified from https://www.spigotmc.org/threads/resetting-a-world.243492/)

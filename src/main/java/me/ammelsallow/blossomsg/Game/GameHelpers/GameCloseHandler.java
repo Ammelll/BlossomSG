@@ -13,6 +13,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.SQLException;
 
@@ -36,7 +37,6 @@ public class GameCloseHandler {
         }
     }
     private void startLobbyCloseTask(){
-        System.out.println("NEW LOBBY CLOSE TASK");
         save = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
             int countDown = 5;
             @Override
@@ -128,11 +128,14 @@ public class GameCloseHandler {
         game.getPlayerKills().clear();
         game.getPlayers().clear();
         game.getGameQueueHandler().getStartingPlayers().clear();
-        try {
-            WorldLoader.rebuild(game.getWorld());
-        }catch(Exception e){
-            System.out.println("FAILED");
-        }
+        WorldLoader.rebuild(game.getMap().getWorld());
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                WorldLoader.unload(game.getMap().getWorld());
+            }
+        }.runTaskLater(game.getPlugin(), 60L);
         }
 
     private void prepPlayers(){

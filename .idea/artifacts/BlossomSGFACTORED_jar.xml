@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="BlossomSGFACTORED:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/BlossomSGFACTORED_jar</output-path>
+  <artifact type="jar" build-on-make="true" name="BlossomSGFACTORED:jar">
+    <output-path>$PROJECT_DIR$/../paper-server/plugins</output-path>
     <root id="archive" name="BlossomSGFACTORED.jar">
       <element id="module-output" name="BlossomSGFACTORED" />
     </root>
