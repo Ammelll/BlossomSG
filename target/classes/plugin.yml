@@ -6,3 +6,5 @@ commands:
     description: gives compass
   kit:
     description: gives kit
+  party:
+    description: parties members

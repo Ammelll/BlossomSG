@@ -2,6 +2,9 @@ package me.ammelsallow.blossomsg.Game.Listeners;
 
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Game;
+import me.ammelsallow.blossomsg.Game.GameHelpers.GameQueueHandler;
+import me.ammelsallow.blossomsg.Game.Misc.Party;
+import me.ammelsallow.blossomsg.Game.Misc.PlayerTeam;
 import me.ammelsallow.blossomsg.Kits.Kit;
 import me.ammelsallow.blossomsg.Kits.Misc.PlayerKitSelection;
 import me.ammelsallow.blossomsg.WorldLoading.Maps.SGMap;
@@ -15,6 +18,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
+import java.util.Map;
 
 public class KitSelectorMenuListener implements Listener {
     private BlossomSG plugin;
@@ -51,14 +57,25 @@ public class KitSelectorMenuListener implements Listener {
 
             switch(e.getCurrentItem().getType()){
                 case DIAMOND_SWORD:
+                    Map<Player, Party> parties = plugin.getParties();
                     if(plugin.getEmptyGame() != null){
                         System.out.println(plugin.getEmptyGame().getMap().getName());
-                        plugin.getEmptyGame().getGameQueueHandler().join(player);
+                        GameQueueHandler gqh = plugin.getEmptyGame().getGameQueueHandler();
+                        if(parties.containsKey(player)){
+                            parties.get(player).join(gqh);
+                        } else {
+                            gqh.join(new PlayerTeam(player));
+                        }
                     } else{
                         Game game = new Game(plugin, SGMap.randomFrommPool());
                         plugin.addGame(game);
                         System.out.println("else " + game.getMap().getName());
-                        game.getGameQueueHandler().join(player);
+                        GameQueueHandler gqh = plugin.getEmptyGame().getGameQueueHandler();
+                        if(parties.containsKey(player)){
+                            parties.get(player).join(gqh);
+                        } else{
+                            gqh.join(new PlayerTeam(player));
+                        }
                     }
                     break;
             }

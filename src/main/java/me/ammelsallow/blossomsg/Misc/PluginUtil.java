@@ -2,6 +2,7 @@ package me.ammelsallow.blossomsg.Misc;
 
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Commands.KitMenuCommand;
+import me.ammelsallow.blossomsg.Game.Commands.PartyCommand;
 import me.ammelsallow.blossomsg.Game.Commands.giveCompass;
 import me.ammelsallow.blossomsg.Game.Listeners.*;
 import me.ammelsallow.blossomsg.Game.Tasks.CheckForWinner;
@@ -48,6 +49,7 @@ public class PluginUtil {
         //Game
         plugin.getCommand("compass").setExecutor(new giveCompass(plugin));
         plugin.getCommand("kit").setExecutor(new KitMenuCommand());
+        plugin.getCommand("party").setExecutor(new PartyCommand(plugin));
         plugin.getServer().getPluginManager().registerEvents(new ArmorStandInteractListener(),plugin);
         plugin.getServer().getPluginManager().registerEvents(new BlockDestroyListener(plugin),plugin);
         plugin.getServer().getPluginManager().registerEvents(new ChestInteractListener(plugin),plugin);

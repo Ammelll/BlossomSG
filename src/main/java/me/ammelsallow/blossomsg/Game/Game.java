@@ -2,6 +2,7 @@ package me.ammelsallow.blossomsg.Game;
 
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.DB.Model.PlayerStats;
+import me.ammelsallow.blossomsg.Game.Misc.PlayerTeam;
 import me.ammelsallow.blossomsg.Game.Misc.RandomEvent;
 import me.ammelsallow.blossomsg.Game.Tasks.CapturePointUpdate;
 import me.ammelsallow.blossomsg.Game.GameHelpers.GameCloseHandler;
@@ -26,6 +27,7 @@ public class Game {
     public final static String sgPrefix = ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "Blossom" + ChatColor.DARK_GRAY + "] ";
 
     private ArrayList<Player> players;
+    private List<PlayerTeam> teams;
     private ArrayList<Player> startingPlayers;
     private BlossomSG plugin;
     private GameQueueHandler gqh;
@@ -35,6 +37,7 @@ public class Game {
         this.map = map;
         plugin = _plugin;
         players = new ArrayList<>();
+        teams = new ArrayList<>();
         playerKills = new HashMap<>();
         playerDeaths = new HashMap<>();
         playerGold = new HashMap<>();
@@ -52,9 +55,12 @@ public class Game {
 
     //NOT DRY
     public void updateDatabase() throws SQLException {
-        PlayerStats winnerStats = getPlayerStatsFromDatabase(gmc.getWinner());
-        winnerStats.setWins(winnerStats.getWins() +1);
-        this.plugin.getDatabased().updatePlayerStats(winnerStats);
+        PlayerTeam winningTeam = gmc.getWinner();
+        for(Player winner : winningTeam.getMembers()) {
+            PlayerStats winnerStats = getPlayerStatsFromDatabase(winner);
+            winnerStats.setWins(winnerStats.getWins() + 1);
+            this.plugin.getDatabased().updatePlayerStats(winnerStats);
+        }
         for(Player player : getGameQueueHandler().getStartingPlayers()){
             if(playerKills.containsKey(player.getUniqueId())) {
                 PlayerStats pStats = getPlayerStatsFromDatabase(player);
@@ -94,23 +100,44 @@ public class Game {
     public World getWorld(){
         return map.getCenter().getWorld();
     }
-    public int getPlayerAmount(){
-        return players.size();
-    }
     public boolean getStarted(){return started;}
     public void setStarted(boolean started){this.started = started;}
     public ArrayList<Player> getPlayers(){
         return players;
     }
+    public List<PlayerTeam> getTeams(){return teams;}
+    public List<PlayerTeam> getAliveTeams(){
+        List<PlayerTeam> aliveTeams = new ArrayList<>();
+        for(PlayerTeam team : teams){
+            if(!team.getAlive().isEmpty()){
+                aliveTeams.add(team);
+            }
+        }
+        return aliveTeams;
+    }
     public void setPlayers(List<Player> players){
         this.players.clear();
         this.players.addAll(players);
     }
+    public void setTeams(List<PlayerTeam> teams){
+        this.teams.clear();
+        this.teams.addAll(teams);
+    }
+
     public RandomEvent generateRandomEvent(int i){
         return new RandomEvent(i,this);
     }
     public RandomEvent getRandomEvent(){return randomEvent;}
     private CapturePointUpdate capture;
+    public PlayerTeam getTeamFromPlayer(Player p){
+        for(PlayerTeam team : teams){
+            if(team.contains(p)){
+                return team;
+            }
+        }
+        return new PlayerTeam(p);
+    }
+
     public void addKill(Player p){
         if(playerKills.containsKey(p.getUniqueId())){
             int kills = playerKills.get(p.getUniqueId());

@@ -1,6 +1,7 @@
 package me.ammelsallow.blossomsg.Game.GameHelpers;
 
 import me.ammelsallow.blossomsg.Game.Game;
+import me.ammelsallow.blossomsg.Game.Misc.PlayerTeam;
 import me.ammelsallow.blossomsg.WorldLoading.WorldLoader;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,22 +16,30 @@ public class GameQueueHandler {
     private Game game;
     private int save;
     private List<Player> players;
+    private List<PlayerTeam> teams;
     public GameQueueHandler(Game game){
         this.game = game;
         players = new ArrayList<>();
+        teams = new ArrayList<>();
     }
 
-    public void join(Player player) {
-        prepPlayer(player);
+    public void join(PlayerTeam team) {
         if (!game.getStarted()) {
-            players.add(player);
+            for(Player player : team.getMembers()){
+                prepPlayer(player);
+                players.add(player);
+            }
+            teams.add(team);
             broadcastQueueUpdate();
             queueReadinessCheck();
         }
+
+
     }
     private void queueReadinessCheck(){
         //save could be 0 because of taskID = 0, not unassigned as we assume.
-        if (players.size() > 1 && save == 0) {
+
+        if (players.size() > 1 && teams.size() > 1 && save == 0) {
             startCountdown();
         }
     }
@@ -42,6 +51,7 @@ public class GameQueueHandler {
     public void leave(Player player){
         if(game.getPlayers().contains(player)) {
             game.getPlayers().remove(player);
+            game.getTeamFromPlayer(player).kill(player);
             if (!game.getStarted()) {
                 broadcastQueueUpdate();
             }
@@ -54,7 +64,7 @@ public class GameQueueHandler {
         }
     }
     private void minimumPlayerCountCheck(){
-        if (players.size()  < 2) {
+        if (players.size()  < 2 || teams.size() < 2) {
             Bukkit.getScheduler().cancelTask(save);
             for(Player p : players) {
                 p.sendMessage(Game.sgPrefix + ChatColor.DARK_RED + "Start canceled, not enough players!");
@@ -84,6 +94,7 @@ public class GameQueueHandler {
                     countDown = 10;
                     System.out.println(players);
                     setPlayers();
+                    setTeams();
                     System.out.println(players);
                     game.getGameMatchHandler().startGame();
                     game.setStarted(true);
@@ -94,6 +105,9 @@ public class GameQueueHandler {
     }
     private void setPlayers(){
         game.setPlayers(players);
+    }
+    private void setTeams(){
+        game.setTeams(teams);
     }
     public List<Player> getStartingPlayers(){
         return players;

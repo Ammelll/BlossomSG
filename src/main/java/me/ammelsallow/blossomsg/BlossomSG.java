@@ -2,6 +2,7 @@ package me.ammelsallow.blossomsg;
 
 import me.ammelsallow.blossomsg.DB.Database;
 import me.ammelsallow.blossomsg.Game.Game;
+import me.ammelsallow.blossomsg.Game.Misc.Party;
 import me.ammelsallow.blossomsg.Game.Mobs.ArmorStandNoClip;
 import me.ammelsallow.blossomsg.Game.Mobs.Frankenstein;
 import me.ammelsallow.blossomsg.Kits.Kit;
@@ -22,13 +23,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 //Want a new Kit?
 //Make a new Kit in KITS
 //add a function for it in KitMenuCommand
 //add associated Listeners/Tasks/Ect in package named after kit under *Kits*
 public final class BlossomSG extends JavaPlugin {
+    Map<Player, Party> parties = new HashMap<>();
     public static final Kit[] KITS = {new Kit(Material.ENDER_PEARL,"ender",new ItemStack[]{CustomItems.getEndermanEnderheart(),CustomItems.getEndermanBlocks()}),new Kit(Material.BOW,"robin",new ItemStack[]{CustomItems.getRobinhoodBow(),new ItemStack(Material.ARROW,5)}),new Kit(Material.FIREBALL,"nether", new ItemStack[]{CustomItems.getNethermageAxe(), CustomItems.getNethermagePotions()}), new Kit(Material.DIAMOND_AXE, "lumber", new ItemStack[]{CustomItems.getLumberjackAxe()}), new Kit(Material.RED_ROSE,"frank", new ItemStack[]{CustomItems.getFrankensteinEgg(),CustomItems.getFrankensteinRoses()}), new Kit(Material.BOAT,"cap", new ItemStack[]{CustomItems.getCaptainRod(),CustomItems.getCaptainBoats()}), new Kit(Material.WHEAT,"shep",new ItemStack[]{CustomItems.getShepherdCrook(),CustomItems.getShepherdEggs(),CustomItems.getShepherdWheat()})};
-    private ArrayList<Game> games = new ArrayList<>();
+    private final List<Game> games = new ArrayList<>();
     private Database database;
     @Override
     public void onEnable(){
@@ -66,8 +71,14 @@ public final class BlossomSG extends JavaPlugin {
     public Database getDatabased() {
         return database;
     }
-    public ArrayList<Game> getGames(){
+    public List<Game> getGames(){
         return  games;
+    }
+    public Map<Player,Party> getParties(){
+        return parties;
+    }
+    public void updateParties(Map<Player,Party> parties){
+        this.parties = parties;
     }
     public Game getGame(Player p){
         for(Game game : games){
@@ -83,7 +94,7 @@ public final class BlossomSG extends JavaPlugin {
 
     public Game getEmptyGame(){
         for(Game g : games){
-            if(g.getCapacity() > g.getPlayerAmount()){
+            if(g.getCapacity() > g.getPlayers().size()){
                 return g;
             }
         }

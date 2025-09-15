@@ -1,6 +1,7 @@
 package me.ammelsallow.blossomsg.Game.Tasks;
 
 import me.ammelsallow.blossomsg.Game.Game;
+import me.ammelsallow.blossomsg.Game.Misc.PlayerTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -20,13 +21,13 @@ public class CapturePointUpdate extends BukkitRunnable {
 
     private Game game;
 
-    private HashMap<UUID,Double> playerPercents = new HashMap<>();
+    private HashMap<UUID,Double> teamPercents = new HashMap<>();
     private String capturePointStatus = "0.0";
     private ArmorStand stand;
     public CapturePointUpdate(Game g){
         this.game = g;
-        for(Player p : game.getPlayers()) {
-            playerPercents.put(p.getUniqueId(), 0.0);
+        for(PlayerTeam team : game.getTeams()) {
+            teamPercents.put(team.getUniqueId(), 0.0);
         }
         stand = (ArmorStand) game.getWorld().spawnEntity(new Location(game.getWorld(),game.getMap().getCenter().getX(),game.getWorld().getHighestBlockYAt(game.getMap().getCenter())-3,game.getMap().getCenter().getZ()), EntityType.ARMOR_STAND);
     }
@@ -56,16 +57,16 @@ public class CapturePointUpdate extends BukkitRunnable {
             }
         }
         if(playersInCapturePoint.size() == 1){
-            Player increaser = playersInCapturePoint.get(0);
-            if(playerPercents.containsKey(increaser.getUniqueId())){
-                double percent = playerPercents.get(increaser.getUniqueId());
+            Player increaserPlayer = playersInCapturePoint.get(0);
+            PlayerTeam increaserTeam = game.getTeamFromPlayer(increaserPlayer);
+            if(teamPercents.containsKey(increaserTeam.getUniqueId())){
+                double percent = teamPercents.get(increaserTeam.getUniqueId());
                 percent +=1.5;
                 if(percent >= 100){
                     System.out.println(game.getGameCloseHandler());
-                    game.getGameCloseHandler().end(increaser);
-                    increaser.sendMessage("INCREASED");
+                    game.getGameCloseHandler().end(increaserTeam);
                 }
-                playerPercents.put(increaser.getUniqueId(),percent);
+                teamPercents.put(increaserTeam.getUniqueId(),percent);
                 capturePointStatus = String.valueOf(getHighestScore());
             }
         } else if(playersInCapturePoint.size() > 1){
@@ -85,9 +86,9 @@ public class CapturePointUpdate extends BukkitRunnable {
         ArrayList<Score> scores = new ArrayList<>();
         scores.add(objective.getScore(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "blossomsg.net"));
         scores.add(objective.getScore(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "                              "));
-        scores.add(objective.getScore(ChatColor.AQUA + "Players " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + game.getPlayerAmount() + ""));
+        scores.add(objective.getScore(ChatColor.AQUA + "Players " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + game.getPlayers().size() + ""));
         scores.add(objective.getScore(ChatColor.AQUA + "Kills " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + game.getKills(p) + ""));
-        scores.add(objective.getScore(ChatColor.AQUA + "Your Score " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + playerPercents.get(p.getUniqueId())+ "%"));
+        scores.add(objective.getScore(ChatColor.AQUA + "Your Score " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + teamPercents.get(game.getTeamFromPlayer(p).getUniqueId())+ "%"));
         scores.add(objective.getScore(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + capturePointStatus + "%"));
 
         for(int i = 0; i < scores.size(); i++){
@@ -107,8 +108,9 @@ public class CapturePointUpdate extends BukkitRunnable {
     private double getHighestScore(){
         Double highest = 0.0;
         for(Player p : game.getPlayers()){
-            if(playerPercents.get(p.getUniqueId()) > highest){
-                highest = playerPercents.get(p.getUniqueId());
+            UUID teamID = game.getTeamFromPlayer(p).getUniqueId();
+            if(teamPercents.get(teamID) > highest){
+                highest = teamPercents.get(teamID);
             }
         }
         return highest;

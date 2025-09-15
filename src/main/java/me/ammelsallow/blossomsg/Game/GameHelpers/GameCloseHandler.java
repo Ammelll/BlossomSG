@@ -1,6 +1,7 @@
 package me.ammelsallow.blossomsg.Game.GameHelpers;
 
 import me.ammelsallow.blossomsg.Game.Game;
+import me.ammelsallow.blossomsg.Game.Misc.PlayerTeam;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
 import me.ammelsallow.blossomsg.WorldLoading.WorldLoader;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -20,14 +21,14 @@ import java.sql.SQLException;
 public class GameCloseHandler {
     private Game game;
     private int save;
-    private Player winner;
+    private PlayerTeam winningTeam;
 
     public GameCloseHandler(Game game){
         this.game = game;
     }
-    public void end(Player winner) {
+    public void end(PlayerTeam winningTeam) {
         game.setStarted(false);
-        this.winner = winner;
+        this.winningTeam = winningTeam;
         celebration();
         startLobbyCloseTask();
         try {
@@ -106,17 +107,19 @@ public class GameCloseHandler {
         game.getPlayers().clear();
     }
     private void celebration(){
-        PlayerConnection connection = ((CraftPlayer) winner.getPlayer()).getHandle().playerConnection;
-        String titleString = ChatColor.GOLD + "" + ChatColor.BOLD + "Victory!";
-        IChatBaseComponent text = IChatBaseComponent.ChatSerializer.a("{'text': ' " + titleString + " ' }");
-        PacketPlayOutTitle packet = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, text, 1, 80, 1);
-        connection.sendPacket(packet);
-        for (int i = 0; i < 5; i++) {
-            winner.getWorld().spawnEntity(winner.getLocation(), EntityType.FIREWORK);
+        for(Player winner : winningTeam.getMembers()){
+            PlayerConnection connection = ((CraftPlayer) winner.getPlayer()).getHandle().playerConnection;
+            String titleString = ChatColor.GOLD + "" + ChatColor.BOLD + "Victory!";
+            IChatBaseComponent text = IChatBaseComponent.ChatSerializer.a("{'text': ' " + titleString + " ' }");
+            PacketPlayOutTitle packet = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, text, 1, 80, 1);
+            connection.sendPacket(packet);
+            for (int i = 0; i < 5; i++) {
+                winner.getWorld().spawnEntity(winner.getLocation(), EntityType.FIREWORK);
+            }
         }
     }
-    public Player getWinner(){
-        return winner;
+    public PlayerTeam getWinner(){
+        return winningTeam;
     }
     private void closeGame() throws SQLException {
         prepPlayers();
