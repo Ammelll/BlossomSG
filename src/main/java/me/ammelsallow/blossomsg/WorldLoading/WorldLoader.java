@@ -10,6 +10,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WorldLoader {
 
@@ -19,33 +21,57 @@ public class WorldLoader {
         WorldLoader.plugin = plugin;
     }
 
-    public static void rebuild(World world) {
-        String worldName = world.getName();
-        delete(world);
-        new BukkitRunnable() {
+    private static final Set<String> rebuildingWorlds = new HashSet<>();
 
-            @Override
-            public void run() {
-                load(worldName);
-            }
-        }.runTaskLater(plugin, 60L);
+    public static boolean isRebuilding(String world) {
+        return rebuildingWorlds.contains(world);
     }
 
-    public static void load(String worldName) {
+    public static void rebuild(World world) {
+        String worldName = world.getName();
+
+        if (rebuildingWorlds.contains(worldName)) return;
+        rebuildingWorlds.add(worldName);
+
+        unload(world);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                delete(world);
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        World loaded = load(worldName);
+
+                        if (loaded != null) {
+                            loaded.getSpawnLocation();
+                        }
+
+                        rebuildingWorlds.remove(worldName);
+
+                    }
+                }.runTask(plugin);
+
+            }
+        }.runTaskLater(plugin, 20L); // give server time to settle
+    }
+
+    public static World load(String worldName) {
         System.out.println("LOADING WORLDS");
         File rootDir = new File("").getAbsoluteFile();
         File unloadedWorldsDir = new File(rootDir, "WorldFiles");
         File from = new File(unloadedWorldsDir, worldName);
         File to = new File(rootDir, worldName);
         try {
-            to.mkdir();
-
             FileUtils.copyDirectory(from, to);
 
-            Bukkit.createWorld(new WorldCreator(worldName));
+            return Bukkit.createWorld(new WorldCreator(worldName));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public static boolean deletePath(File path) {
@@ -63,10 +89,7 @@ public class WorldLoader {
     }
 
     public static void delete(World world) {
-        File path = world.getWorldFolder();
-        // Bukkit.getWorlds().remove(world);
-        unload(world);
-        deletePath(path);
+        deletePath(world.getWorldFolder());
     }
 
     public static void unload(World world) {

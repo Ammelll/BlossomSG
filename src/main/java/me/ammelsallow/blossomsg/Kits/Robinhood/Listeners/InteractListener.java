@@ -16,9 +16,10 @@ import java.util.UUID;
 public class InteractListener implements Listener {
     private final HashMap<UUID, Long> cooldown;
 
-
-    public InteractListener() {
+    EntityDamageListener damageListener;
+    public InteractListener(EntityDamageListener  damageListener) {
         this.cooldown = new HashMap<>();
+        this.damageListener = damageListener;
     }
 
 
@@ -40,6 +41,8 @@ public class InteractListener implements Listener {
                         if (timeElapsed >= 10000) {
                             this.cooldown.put(p.getUniqueId(), System.currentTimeMillis());
                             p.setVelocity(p.getLocation().getDirection().multiply(1.4).setY(0.7));
+                            p.setFallDistance(0);
+                            damageListener.use(p);
                         } else {
                             p.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "You cannot use that ability for (" + Math.floor(((10000 - timeElapsed) * 10) / 1000.0) / 10 + "s)");
 

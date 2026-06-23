@@ -1,13 +1,17 @@
 package me.ammelsallow.blossomsg.Kits.Robinhood.Misc;
 
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
@@ -25,7 +29,32 @@ public class CustomItems {
         compass.setItemMeta(compassMeta);
         return compass;
     }
-
+    public static ItemStack getSplashableSpeed2(){
+        ItemStack speedPotion = new Potion(PotionType.SPEED,2).toItemStack(1);
+        PotionMeta speedPotionMeta = (PotionMeta) speedPotion.getItemMeta();
+        speedPotionMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 400, 1), true);
+        speedPotion.setItemMeta(speedPotionMeta);
+        return speedPotion;
+    }
+    public static ItemStack getPayday(){
+        ItemStack payday = new ItemStack(Material.CHEST);
+        ItemMeta paydayMeta = payday.getItemMeta();
+        paydayMeta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "PAYDAY");
+        net.minecraft.server.v1_8_R3.ItemStack NMSpayday = CraftItemStack.asNMSCopy(payday);
+        NBTTagCompound paydayCompound = (NMSpayday.hasTag()) ? NMSpayday.getTag() : new NBTTagCompound();
+        paydayCompound.setInt("isPayDay",1);
+        NMSpayday.setTag(paydayCompound);
+        payday = CraftItemStack.asBukkitCopy(NMSpayday);
+        payday.setItemMeta(paydayMeta);
+        return payday;
+    }
+    public static ItemStack getRegenerationPotion(){
+        ItemStack regenPotion = new Potion(PotionType.REGEN,1).toItemStack(1);
+        PotionMeta regenPotionMeta = (PotionMeta) regenPotion.getItemMeta();
+        regenPotionMeta.addCustomEffect(new PotionEffect(PotionEffectType.REGENERATION, 400, 1), false);
+        regenPotion.setItemMeta(regenPotionMeta);
+        return regenPotion;
+    }
     public static ItemStack getEndermanBlocks() {
         ItemStack blocks = new ItemStack(Material.GRASS, 7);
         ItemMeta blocksMeta = blocks.getItemMeta();
@@ -38,7 +67,14 @@ public class CustomItems {
         blocks.setItemMeta(blocksMeta);
         return blocks;
     }
-
+    public static ItemStack getTickler(){
+        ItemStack tickler = new ItemStack(Material.FEATHER,1);
+        ItemMeta ticklerMeta = tickler.getItemMeta();
+        ticklerMeta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "The Tickler");
+        ticklerMeta.addEnchant(Enchantment.DAMAGE_ALL,5,false);
+        tickler.setItemMeta(ticklerMeta);
+        return tickler;
+    }
     public static ItemStack getEndermanEnderheart() {
         ItemStack heart = new ItemStack(Material.INK_SACK);
         Short s = 5;
@@ -60,6 +96,8 @@ public class CustomItems {
         bowLore.add(ChatColor.RED + "Retains arrows on hit");
         bowMeta.setLore(bowLore);
         bowMeta.spigot().setUnbreakable(true);
+        bowMeta.addEnchant(Enchantment.SILK_TOUCH,0,false);
+        bowMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         bow.setItemMeta(bowMeta);
         return bow;
     }

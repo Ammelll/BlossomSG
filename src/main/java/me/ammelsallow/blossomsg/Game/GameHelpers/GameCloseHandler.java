@@ -2,6 +2,7 @@ package me.ammelsallow.blossomsg.Game.GameHelpers;
 
 import me.ammelsallow.blossomsg.Game.Game;
 import me.ammelsallow.blossomsg.Game.Misc.PlayerTeam;
+import me.ammelsallow.blossomsg.Game.Misc.RandomEvent;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
 import me.ammelsallow.blossomsg.WorldLoading.WorldLoader;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
@@ -27,10 +28,11 @@ public class GameCloseHandler {
         this.game = game;
     }
     public void end(PlayerTeam winningTeam) {
-        game.setStarted(false);
         this.winningTeam = winningTeam;
+        game.setFinished(true);
         celebration();
         startLobbyCloseTask();
+        endTasks();
         try {
             game.updateDatabase();
         }catch(Exception e){
@@ -43,10 +45,10 @@ public class GameCloseHandler {
             @Override
             public void run() {
                 if(countDown > 0){
-                    countDown--;
                     for(Player p : game.getPlayers()){
                         p.sendMessage(Game.sgPrefix + ChatColor.WHITE + "The lobby will close in " + ChatColor.RED + "" + ChatColor.BOLD + countDown + ChatColor.RESET + " seconds!");
                     }
+                    countDown--;
                 } else{
                     Bukkit.getScheduler().cancelTask(save);
                     countDown = 5;
@@ -60,45 +62,6 @@ public class GameCloseHandler {
                 }
             }
         },20L,20L);
-
-//    int countdown = 5;
-//    @Override
-//    public void run() {
-//        if(countdown > 0){
-//            for (Player p : game.getPlayers()){
-//                p.sendMessage(Game.sgPrefix + ChatColor.WHITE + "The lobby will close in " + ChatColor.RED + "" + ChatColor.BOLD + countdown + ChatColor.RESET + " seconds!");
-//            }
-//            countdown--;
-//        } else{
-//            Bukkit.getScheduler().cancelTask(save);
-//        }
-//    }
-//        save = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
-//            int countDown = 5;
-//
-//            @Override
-//            public void run() {
-//                System.out.println(save);
-//                if (countDown > 0) {
-//                    for (Player p : Bukkit.getOnlinePlayers()) {
-//                        p.sendMessage(Game.sgPrefix + ChatColor.WHITE + "The lobby will close in " + ChatColor.RED + "" + ChatColor.BOLD + countDown + ChatColor.RESET + " seconds!");
-//                    }
-//                    countDown--;
-//                } else {
-//                    System.out.println("CANCELLING");
-//                    Bukkit.getScheduler().cancelTask(save);
-//
-//                    game.getGameMatchHandler().cancelCapture();
-//                    try {
-//                        closeGame();
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    }
-//                    endComponents();
-//                }
-//
-//            }
-//        }, 20, 20);
     }
 
 
@@ -126,19 +89,13 @@ public class GameCloseHandler {
         prepGame();
     }
 
-    private void prepGame() {
-        game.getPlugin().removeGame(game);
-        game.getPlayerKills().clear();
-        game.getPlayers().clear();
-        game.getGameQueueHandler().getStartingPlayers().clear();
-        WorldLoader.rebuild(game.getMap().getWorld());
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                WorldLoader.unload(game.getMap().getWorld());
-            }
-        }.runTaskLater(game.getPlugin(), 60L);
+        private void prepGame() {
+            game.getPlugin().removeGame(game);
+            game.getPlayerKills().clear();
+            game.getPlayers().clear();
+            game.getGameQueueHandler().getStartingPlayers().clear();
+            WorldLoader.rebuild(game.getMap().getWorld());
+            game.setStarted(false);
         }
 
     private void prepPlayers(){
@@ -158,7 +115,8 @@ public class GameCloseHandler {
 
     private void sendToLobby(Player p) {
         //14.5 ,108 ,24.5
-        p.teleport(new Location(Bukkit.getWorld("world"),-144.5,71,272.5));
+        if(!p.getWorld().getName().equals(game.getWorld().getName())) return;
+        p.teleport(new Location(Bukkit.getWorld("world"),-454.5,97,372.5));
         p.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The game has ended and you have been sent back to the lobby!");
     }
 
@@ -170,6 +128,17 @@ public class GameCloseHandler {
         i.setBoots(null);
         i.clear();
         i.setItem(0, CustomItems.getCompassSelector());
-        Bukkit.broadcastMessage("PREPPED");
+    }
+    public void endTasks(){
+        GameMatchHandler gmh = game.getGameMatchHandler();
+        RandomEvent re = game.getRandomEvent();
+        int savePVP = gmh.getSavePVP();
+        int speedID = gmh.getSpeedID();
+        int taskID = re.getTaskID();
+        int regenerationID = re.getRegenerationID();
+        Bukkit.getScheduler().cancelTask(savePVP);
+        Bukkit.getScheduler().cancelTask(taskID);
+        Bukkit.getScheduler().cancelTask(speedID);
+        Bukkit.getScheduler().cancelTask(regenerationID);
     }
 }

@@ -43,6 +43,7 @@ public class giveCompass implements CommandExecutor {
         i.setItem(5, CustomItems.getCompassSelector());
         i.setItem(6,CustomItems.getFrankensteinEgg());
         i.setItem(7,CustomItems.getFrankensteinRoses());
+        i.setItem(8,CustomItems.getPayday());
         p.setGameMode(GameMode.CREATIVE);
         resetScoreboard(p);
 //        p.setWalkSpeed(0.2f);
@@ -50,18 +51,6 @@ public class giveCompass implements CommandExecutor {
 //        summonSupplyDrop();
 
         return true;
-    }
-    private ItemStack getPayDay(){
-        ItemStack payday = new ItemStack(Material.CHEST);
-        ItemMeta paydayMeta = payday.getItemMeta();
-        paydayMeta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "PAYDAY");
-        net.minecraft.server.v1_8_R3.ItemStack NMSpayday = CraftItemStack.asNMSCopy(payday);
-        NBTTagCompound paydayCompound = (NMSpayday.hasTag()) ? NMSpayday.getTag() : new NBTTagCompound();
-        paydayCompound.setInt("isPayDay",2);
-        NMSpayday.setTag(paydayCompound);
-        payday = CraftItemStack.asBukkitCopy(NMSpayday);
-        payday.setItemMeta(paydayMeta);
-        return payday;
     }
     private void summonSupplyDrop() {
         Location location = new Location(Bukkit.getWorld("sg4"),0.5,50,-2.5);

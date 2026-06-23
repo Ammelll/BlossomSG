@@ -43,8 +43,8 @@ public class KitSelectorMenuListener implements Listener {
             if(e.getCurrentItem() == null){
                 return;
             }
-            for(int i = 0; i < BlossomSG.KITS.length; i++){
-                Kit kit = BlossomSG.KITS[i];
+            for(int i = 0; i < BlossomSG.KITS.size(); i++){
+                Kit kit = BlossomSG.KITS.get(i);
                 if(e.getCurrentItem().getType() == kit.material){
                     inventory.setItem(i,addGlow(inventory,i));
                     Player p = (Player) e.getWhoClicked();
@@ -67,7 +67,12 @@ public class KitSelectorMenuListener implements Listener {
                             gqh.join(new PlayerTeam(player));
                         }
                     } else{
-                        Game game = new Game(plugin, SGMap.randomFrommPool());
+                        Game game = new Game(plugin, SGMap.randomFrommPool(plugin));
+                        if(game.getMap() == null){
+                            e.setCancelled(true);
+                            player.sendMessage(ChatColor.RED + "There is no available game server at this moment");
+                            return;
+                        }
                         plugin.addGame(game);
                         System.out.println("else " + game.getMap().getName());
                         GameQueueHandler gqh = plugin.getEmptyGame().getGameQueueHandler();

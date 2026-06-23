@@ -131,8 +131,8 @@ public class KitMenuCommand implements CommandExecutor {
     public void loadSelectedKit(Player p, Inventory menu){
         if(PlayerKitSelection.selectedKit.containsKey(p.getUniqueId())){
             String stringID = PlayerKitSelection.selectedKit.get(p.getUniqueId());
-            for(int i = 0; i < BlossomSG.KITS.length; i++){
-                Kit kit = BlossomSG.KITS[i];
+            for(int i = 0; i < BlossomSG.KITS.size(); i++){
+                Kit kit = BlossomSG.KITS.get(i);
                 if(stringID.equals(kit.stringID)){
                     menu.setItem(i,KitSelectorMenuListener.addGlow(menu,i));
                 }

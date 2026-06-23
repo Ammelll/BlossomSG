@@ -22,7 +22,7 @@ public class CapturePointUpdate extends BukkitRunnable {
     private Game game;
 
     private HashMap<UUID,Double> teamPercents = new HashMap<>();
-    private String capturePointStatus = "0.0";
+    private String capturePointStatus = "0.0%";
     private ArmorStand stand;
     public CapturePointUpdate(Game g){
         this.game = g;
@@ -30,6 +30,8 @@ public class CapturePointUpdate extends BukkitRunnable {
             teamPercents.put(team.getUniqueId(), 0.0);
         }
         stand = (ArmorStand) game.getWorld().spawnEntity(new Location(game.getWorld(),game.getMap().getCenter().getX(),game.getWorld().getHighestBlockYAt(game.getMap().getCenter())-3,game.getMap().getCenter().getZ()), EntityType.ARMOR_STAND);
+        stand.setVisible(false);
+        stand.setMaxHealth(1000);
     }
     @Override
     public void run() {
@@ -37,7 +39,7 @@ public class CapturePointUpdate extends BukkitRunnable {
             updateScoreboard(p);
         }
 
-        List<Entity> entitiesInBoundingBox = stand.getNearbyEntities(10,10,10);
+        List<Entity> entitiesInBoundingBox = stand.getNearbyEntities(10,3,10);
         ArrayList<Player> playersInBoundingBox = new ArrayList<>();
         ArrayList<Player> playersInCapturePoint = new ArrayList<>();
         for(Entity e : entitiesInBoundingBox){
@@ -46,13 +48,12 @@ public class CapturePointUpdate extends BukkitRunnable {
             }
         }
         for(Player p : playersInBoundingBox){
-            int xCoordinatePlayer =  (p.getLocation().getBlockX() );
-            int zCoordinatePlayer = (p.getLocation().getBlockZ());
+            double xCoordinatePlayer =  (p.getLocation().getX() );
+            double zCoordinatePlayer = (p.getLocation().getZ());
 
-            int xCoordinateCenter = (stand.getLocation().getBlockX());
-            int zCoordinateCenter =  (stand.getLocation().getBlockZ());
-
-            if(Math.abs(xCoordinateCenter-xCoordinatePlayer) + Math.abs(zCoordinateCenter-zCoordinatePlayer) < 8){
+            double xCoordinateCenter = (stand.getLocation().getX());
+            double zCoordinateCenter =  (stand.getLocation().getZ());
+            if(Math.hypot(xCoordinateCenter-xCoordinatePlayer,zCoordinateCenter-zCoordinatePlayer) < 7.5){
                 playersInCapturePoint.add(p);
             }
         }
@@ -62,17 +63,17 @@ public class CapturePointUpdate extends BukkitRunnable {
             if(teamPercents.containsKey(increaserTeam.getUniqueId())){
                 double percent = teamPercents.get(increaserTeam.getUniqueId());
                 percent +=1.5;
-                if(percent >= 100){
+                if(percent >= 100 && !game.getFinished()){
                     System.out.println(game.getGameCloseHandler());
                     game.getGameCloseHandler().end(increaserTeam);
                 }
                 teamPercents.put(increaserTeam.getUniqueId(),percent);
-                capturePointStatus = String.valueOf(getHighestScore());
+                capturePointStatus = getHighestScore() + "%";
             }
         } else if(playersInCapturePoint.size() > 1){
             capturePointStatus = "Contested";
         } else {
-            capturePointStatus = String.valueOf(getHighestScore());
+            capturePointStatus = getHighestScore() + "%";
         }
 
     }
@@ -89,7 +90,7 @@ public class CapturePointUpdate extends BukkitRunnable {
         scores.add(objective.getScore(ChatColor.AQUA + "Players " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + game.getPlayers().size() + ""));
         scores.add(objective.getScore(ChatColor.AQUA + "Kills " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + game.getKills(p) + ""));
         scores.add(objective.getScore(ChatColor.AQUA + "Your Score " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + teamPercents.get(game.getTeamFromPlayer(p).getUniqueId())+ "%"));
-        scores.add(objective.getScore(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + capturePointStatus + "%"));
+        scores.add(objective.getScore(ChatColor.AQUA + "Objective " + ChatColor.DARK_GRAY + "> " + ChatColor.RESET + capturePointStatus));
 
         for(int i = 0; i < scores.size(); i++){
             scores.get(i).setScore(i);

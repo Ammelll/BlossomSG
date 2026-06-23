@@ -4,6 +4,7 @@ package me.ammelsallow.blossomsg.Game.Misc;
 import me.ammelsallow.blossomsg.Game.Game;
 import me.ammelsallow.blossomsg.Game.Mobs.ArmorStandNoClip;
 import me.ammelsallow.blossomsg.Game.GameHelpers.GameScoreboardHandler;
+import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,19 +33,24 @@ public class RandomEvent {
     int save;
     ArmorStand drop;
     int taskID;
+    ChatColor eventColor = ChatColor.RESET;
+    int regenerationID;
 
     public RandomEvent(int i, Game game) {
         eventInt = i;
         this.game = game;
         switch (eventInt) {
             case 0:
-                eventType = "SupplyDrop";
+                eventType = "Supply Drop";
+                eventColor = ChatColor.DARK_AQUA;
                 break;
             case 1:
-                eventType = "PayDay";
+                eventType = "Payday";
+                eventColor = ChatColor.DARK_GREEN;
                 break;
             case 2:
                 eventType = "Juggernaut";
+                eventColor = ChatColor.RED;
                 break;
             default:
                 eventType = "noEvent";
@@ -53,18 +59,18 @@ public class RandomEvent {
     }
 
     public void trigger() {
+        for(Player p : game.getPlayers()){
+            p.sendTitle(ChatColor.BOLD + "" + eventColor + eventType,"");
+        }
         switch (eventType) {
-            case "SupplyDrop":
-                Bukkit.broadcastMessage("SUPPLYDROP");
+            case "Supply Drop":
                 summonSupplyDrop();
                 break;
-            case "PayDay":
+            case "Payday":
                 givePayDay();
-                Bukkit.broadcastMessage("PAYDAY");
                 break;
             case "Juggernaut":
                 juggernautInitiate();
-                Bukkit.broadcastMessage("JUGGERNAUT");
                 break;
         }
     }
@@ -73,27 +79,40 @@ public class RandomEvent {
         for(Player p : game.getPlayers()){
             PotionEffect potionEffectHealthBoost = new PotionEffect(PotionEffectType.HEALTH_BOOST,1000000,2);
             PotionEffect potionEffectRegeneration= new PotionEffect(PotionEffectType.REGENERATION,1000000,0);
-            p.addPotionEffects(Arrays.asList(new PotionEffect[]{potionEffectRegeneration, potionEffectHealthBoost}));
+            p.addPotionEffect(potionEffectHealthBoost);
         }
+        regenerationRunnable();
+    }
+    private void regenerationRunnable(){
+        regenerationID = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(),new Runnable(){
+            @Override
+            public void run(){
+                for(Player p : game.getPlayers()) {
+                    if (p.getActivePotionEffects().stream().noneMatch(pe -> pe.getType() == PotionEffectType.REGENERATION)) {
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 1000000, 0));
+                    }
+                }
+            }
+        },0,20L);
     }
 
     private void summonSupplyDrop() {
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
-            int countDown = 16;
+            int countDown = 15;
 
             @Override
             public void run() {
-                if(countDown > 1){
-                    countDown--;
+                if(countDown > 0){
                     for(Player p : game.getPlayers()){
                         p.sendMessage(Game.sgPrefix + ChatColor.RESET +"A supply drop is dropping in " +ChatColor.RED + "" +ChatColor.BOLD + countDown + ChatColor.RESET + " seconds");
                     }
+                    countDown--;
 
                 } else{
                     for(Player p : game.getPlayers()){
                         p.sendMessage(Game.sgPrefix + ChatColor.RESET + "A supply drop has spawned over the"  + ChatColor.AQUA + "" + ChatColor.BOLD +" Capture Point");
                     }
-                    countDown = 16;
+                    countDown = 15;
                     Bukkit.getScheduler().cancelTask(taskID);
                     Location location = game.getMap().getCenter().add(0,20,0);
                     ArmorStandNoClip asnc = new ArmorStandNoClip(((CraftWorld) location.getWorld()).getHandle());
@@ -126,47 +145,38 @@ public class RandomEvent {
     }
     private void givePayDay(){
         for(Player p : game.getPlayers()){
-            p.getInventory().addItem(getPayDay());
-            Inventory i = p.getInventory();
-
+            p.getInventory().addItem(CustomItems.getPayday());
         }
-    }
-
-    private ItemStack getPayDay(){
-        ItemStack payday = new ItemStack(Material.CHEST);
-        ItemMeta paydayMeta = payday.getItemMeta();
-        paydayMeta.setDisplayName(ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "PAYDAY");
-        net.minecraft.server.v1_8_R3.ItemStack NMSpayday = CraftItemStack.asNMSCopy(payday);
-        NBTTagCompound paydayCompound = (NMSpayday.hasTag()) ? NMSpayday.getTag() : new NBTTagCompound();
-        paydayCompound.setInt("isPayDay",1);
-        NMSpayday.setTag(paydayCompound);
-        payday = CraftItemStack.asBukkitCopy(NMSpayday);
-        payday.setItemMeta(paydayMeta);
-        return payday;
     }
     public void start() {
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
-            int countDown = 62;
+            int countDown = 60;
 
 
             @Override
             public void run() {
-                if (countDown > 1) {
-                    countDown--;
+                if (countDown > 0) {
                     for (Player p : game.getPlayers()) {
                         GameScoreboardHandler.setScoreboard(p, countDown, "Random Event ", true,7);
                     }
+                    countDown--;
                 } else {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        p.sendMessage(Game.sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD + "The grace period is over!");
                         GameScoreboardHandler.setScoreboard(p, countDown, "Random Event ", false,7);
                     }
-                    countDown = 62;
+                    countDown = 60;
                     Bukkit.getScheduler().cancelTask(taskID);
                     game.getGameMatchHandler().startCapturePoint();
                     trigger();
                 }
             }
         }, 6L, 20L);
+    }
+
+    public int getTaskID() {
+        return taskID;
+    }
+    public int getRegenerationID(){
+        return regenerationID;
     }
 }

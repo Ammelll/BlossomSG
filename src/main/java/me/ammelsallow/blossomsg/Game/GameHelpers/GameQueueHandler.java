@@ -6,6 +6,7 @@ import me.ammelsallow.blossomsg.WorldLoading.WorldLoader;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -24,8 +25,17 @@ public class GameQueueHandler {
     }
 
     public void join(PlayerTeam team) {
+        String worldName = game.getMap().getName();
+
+        World world = Bukkit.getWorld(worldName);
+
+        System.out.println("started" + game.getStarted());
         if (!game.getStarted()) {
             for(Player player : team.getMembers()){
+                if (world == null || WorldLoader.isRebuilding(worldName)) {
+                    player.sendMessage(ChatColor.RED + "Arena is still loading.");
+                    return;
+                }
                 prepPlayer(player);
                 players.add(player);
             }
@@ -45,6 +55,8 @@ public class GameQueueHandler {
     }
     private void prepPlayer(Player p){
         p.setGameMode(GameMode.SPECTATOR);
+        String worldName = game.getMap().getName();
+        System.out.println(worldName);
         p.teleport(game.getMap().getCenter());
         p.getInventory().clear();
     }
@@ -74,14 +86,14 @@ public class GameQueueHandler {
     }
     public void startCountdown(){
         save = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
-            int countDown = 10;
+            int countDown = 5;
             @Override
             public void run() {
-                if(countDown > 1){
-                    countDown--;
+                if(countDown > 0){
                     for(Player p : players) {
                         p.sendMessage(Game.sgPrefix + ChatColor.WHITE + "The game will begin in " + ChatColor.RED + "" + ChatColor.BOLD + countDown + ChatColor.RESET+ " seconds!");
                     }
+                    countDown--;
                 }
                 else{
                     for(Player p : players) {
@@ -91,13 +103,14 @@ public class GameQueueHandler {
                     }
 
                     Bukkit.getScheduler().cancelTask(save);
-                    countDown = 10;
+                    countDown = 5;
                     System.out.println(players);
                     setPlayers();
                     setTeams();
                     System.out.println(players);
                     game.getGameMatchHandler().startGame();
                     game.setStarted(true);
+                    System.out.println("STARTED" + game.getStarted() + " " + game.uuid);
                 }
             }
         },20,20);

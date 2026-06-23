@@ -10,7 +10,7 @@ import org.bukkit.scoreboard.Scoreboard;
 public abstract class GameScoreboardHandler {
 
 
-    public static final void setScoreboard(Player p, int countdown, String title, boolean keep,int index) {
+    public static void setScoreboard(Player p, int countdown, String title, boolean keep,int index) {
         Scoreboard scoreboard = p.getScoreboard();
         Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
         Score score;
@@ -26,12 +26,12 @@ public abstract class GameScoreboardHandler {
         }
     }
 
-    private static final String convertTimeFormat(int totalSeconds) {
+    private static String convertTimeFormat(int totalSeconds) {
         int seconds = totalSeconds % 60;
         int minutes = (totalSeconds % 3600) / 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
-    public static final void resetScoreboard(Player p){
+    public static void resetScoreboard(Player p){
         Scoreboard scoreboard = p.getScoreboard();
         scoreboard.getEntries().forEach(entry -> scoreboard.resetScores(entry));
     }

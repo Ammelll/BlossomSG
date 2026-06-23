@@ -13,9 +13,12 @@ import org.bukkit.inventory.Inventory;
 
 public class JoinLeaveListener implements Listener {
     BlossomSG plugin;
+
     public JoinLeaveListener(BlossomSG p){
         this.plugin = p;
     }
+
+
 
 
     @EventHandler
@@ -23,7 +26,7 @@ public class JoinLeaveListener implements Listener {
         Player player = e.getPlayer();
         World world = player.getWorld();
         if(world.getName().equals("world")) {
-            Location location = new Location(world, -144.5,71,272.5);
+            Location location = new Location(world, -454.5,97,372.5);
             player.teleport(location);
             Inventory inventory = player.getInventory();
             inventory.clear();

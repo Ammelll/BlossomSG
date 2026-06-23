@@ -4,9 +4,12 @@ import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Game.Game;
 import me.ammelsallow.blossomsg.Kits.Kit;
 import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
+import me.ammelsallow.blossomsg.Misc.Util;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -41,6 +44,7 @@ public class PlayerDeathListener implements Listener {
             if(plugin.getGame(killer) != null) {
                 plugin.getGame(killer).addKill(killer);
                 plugin.getGame(killer).addGold(killer,150);
+                Util.addHealth(killer,6);
             }
         }
         if(plugin.getGame(p) != null){
@@ -61,6 +65,11 @@ public class PlayerDeathListener implements Listener {
                 }
             }
         }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            ((CraftPlayer) p).getHandle().playerConnection
+                    .a(new PacketPlayInClientCommand(
+                            PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN));
+        }, 1L);
 
     }
     @EventHandler

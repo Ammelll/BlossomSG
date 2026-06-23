@@ -13,7 +13,7 @@ public class Database {
         }
         String url = "jdbc:mysql://localhost/stat_tracker?characterEncoding=latin1";
         String user = "root";
-        String password = "";
+        String password = "root";
 
         this.connection = DriverManager.getConnection(url,user,password);
 

@@ -20,6 +20,7 @@ public class Game {
     RandomEvent randomEvent;
     private SGMap map;
     private boolean started;
+    private boolean finished;
     private Map<UUID,Integer> playerKills;
     private Map<UUID,Integer> playerDeaths;
     private Map<UUID,Integer> playerGold;
@@ -33,6 +34,7 @@ public class Game {
     private GameQueueHandler gqh;
     private GameMatchHandler gmh;
     private GameCloseHandler gmc;
+    public UUID uuid = UUID.randomUUID();
     public Game(BlossomSG _plugin, SGMap map){
         this.map = map;
         plugin = _plugin;
@@ -43,6 +45,7 @@ public class Game {
         playerGold = new HashMap<>();
         mobMap = new HashMap<>();
         started = false;
+        finished = false;
         //Always supply drop
         randomEvent = generateRandomEvent((int) (Math.random() * 3));
         this.gqh = new GameQueueHandler(this);
@@ -53,7 +56,6 @@ public class Game {
     public GameQueueHandler getGameQueueHandler(){return gqh;}
     public GameCloseHandler getGameCloseHandler(){return gmc;}
 
-    //NOT DRY
     public void updateDatabase() throws SQLException {
         PlayerTeam winningTeam = gmc.getWinner();
         for(Player winner : winningTeam.getMembers()) {
@@ -65,7 +67,6 @@ public class Game {
             if(playerKills.containsKey(player.getUniqueId())) {
                 PlayerStats pStats = getPlayerStatsFromDatabase(player);
                 pStats.setKills(pStats.getKills() + playerKills.get(player.getUniqueId()));
-                Bukkit.broadcastMessage(playerKills.get(player.getUniqueId()) + "");
                 this.plugin.getDatabased().updatePlayerStats(pStats);
             }
             if(playerDeaths.containsKey(player.getUniqueId())){
@@ -102,6 +103,8 @@ public class Game {
     }
     public boolean getStarted(){return started;}
     public void setStarted(boolean started){this.started = started;}
+    public boolean getFinished(){return finished;}
+    public void setFinished(boolean finished){this.finished = finished;}
     public ArrayList<Player> getPlayers(){
         return players;
     }
@@ -140,27 +143,33 @@ public class Game {
 
     public void addKill(Player p){
         if(playerKills.containsKey(p.getUniqueId())){
-            int kills = playerKills.get(p.getUniqueId());
-            playerKills.put(p.getUniqueId(),kills+1);
+            playerKills.compute(p.getUniqueId(), (k, kills) -> kills + 1);
         } else{
             playerKills.put(p.getUniqueId(),1);
         }
     }
     public void addMob(UUID playerUUID, UUID mobUUID){
-        this.mobMap.put(playerUUID,Arrays.asList(mobUUID));
+        if(this.mobMap.containsKey(playerUUID)){
+            List<UUID> newMobs = mobMap.get(playerUUID);
+            newMobs.add(mobUUID);
+            this.mobMap.put(playerUUID,newMobs);
+        } else {
+            List<UUID> newMobs = new ArrayList<>();
+            newMobs.add(mobUUID);
+            this.mobMap.put(playerUUID, newMobs);
+        }
     }
     public void addDeath(Player p){
         if(playerDeaths.containsKey(p.getUniqueId())){
-            int deaths = playerDeaths.get(p.getUniqueId());
-            playerDeaths.put(p.getUniqueId(),deaths+1);
+            playerDeaths.compute(p.getUniqueId(), (k, deaths) -> deaths + 1);
         } else{
             playerDeaths.put(p.getUniqueId(),1);
         }
     }
     public void addGold(Player p, int goldAmount){
+        p.sendMessage("" +ChatColor.GOLD + ChatColor.BOLD + "+" + goldAmount);
         if(playerGold.containsKey(p.getUniqueId())){
-            int gold = playerGold.get(p.getUniqueId());
-            playerGold.put(p.getUniqueId(),gold+goldAmount);
+            playerGold.compute(p.getUniqueId(), (k, gold) -> gold + goldAmount);
         } else{
             playerGold.put(p.getUniqueId(),goldAmount);
         }

@@ -15,6 +15,7 @@ public class PlayerDamageListener implements Listener {
         Player p = (Player) e.getEntity();
         if(p.isInsideVehicle()){
             p.getVehicle().remove();
+            p.teleport(p.getLocation().add(0,1,0));
         }
 
     }

@@ -35,6 +35,11 @@ public class BlockDestroyListener implements Listener {
             world.dropItemNaturally(location.add(0,0.5,0), new ItemStack(Material.IRON_INGOT));
             return;
         }
+        if(type == Material.WEB){
+            brokenBlock.setType(Material.AIR);
+            world.dropItemNaturally(location.add(0,0.5,0),new ItemStack(Material.STRING));
+            return;
+        }
         if(type == Material.GOLD_ORE){
             brokenBlock.setType(Material.AIR);
             if(plugin.getGame(p) !=null) {
@@ -53,6 +58,7 @@ public class BlockDestroyListener implements Listener {
         if(type == Material.COAL_ORE) {
             return;
         }
+
 
         if(!p.hasPermission("blossomsg.brockbreak")){
             p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Hey, you cannot break blocks here!!");

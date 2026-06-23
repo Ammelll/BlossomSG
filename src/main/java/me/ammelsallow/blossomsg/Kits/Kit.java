@@ -9,9 +9,14 @@ public class Kit {
     public Material material;
     public String stringID;
     public ItemStack[] items;
+    public ItemStack[] armor;
     public Kit(Material material, String stringID, ItemStack[] items){
+        this(material,stringID,items,new ItemStack[]{});
+    }
+    public Kit(Material material, String stringID, ItemStack[] items, ItemStack[] armor){
         this.material = material;
         this.stringID = stringID;
         this.items = items;
+        this.armor = armor;
     }
 }

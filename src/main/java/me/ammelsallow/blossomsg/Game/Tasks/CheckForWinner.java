@@ -13,7 +13,7 @@ public class CheckForWinner extends BukkitRunnable {
     @Override
     public void run() {
         for(Game g : plugin.getGames()){
-            if(g.getAliveTeams().size() == 1 && g.getStarted()){
+            if(g.getAliveTeams().size() == 1 && !g.getFinished()){
                 g.getGameCloseHandler().end(g.getTeams().get(0));
                 break;
             }

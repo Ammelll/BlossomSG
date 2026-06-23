@@ -23,7 +23,11 @@ public class Cooldown {
         long timeElapsed = System.currentTimeMillis() - map.get(p.getUniqueId());
         return  timeElapsed >= cooldown;
     }
+    public boolean found(Player p){
+        return map.containsKey(p.getUniqueId());
+    }
     public double left(Player p){
+
         long timeElapsed = System.currentTimeMillis() - map.get(p.getUniqueId());
         return  Math.floor(((cooldown - timeElapsed) * 10) / 1000.0) / 10;
     }

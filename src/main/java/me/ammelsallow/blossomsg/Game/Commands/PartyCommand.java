@@ -27,6 +27,11 @@ public class PartyCommand implements CommandExecutor {
         if (!(sender instanceof Player)) {
             return false;
         }
+        plugin.getGame((Player) sender).getRandomEvent().trigger();
+        ((Player) sender).sendMessage("RANDOM EVENT");
+        if(args.length == 0){
+            return false;
+        }
         Player p = (Player) sender;
         Map<Player, Party> parties = plugin.getParties();
         String subject = args[0];

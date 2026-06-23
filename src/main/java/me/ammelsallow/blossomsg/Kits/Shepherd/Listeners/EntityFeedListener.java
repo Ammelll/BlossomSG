@@ -39,6 +39,10 @@ public class EntityFeedListener implements Listener {
             if(assocUUID != null){
                 if(assocUUID.contains(clicked.getUniqueId())){
                     if(p.getItemInHand().isSimilar(CustomItems.getShepherdWheat())){
+                        if(clicked instanceof Sheep){
+                            Sheep sheep = (Sheep) clicked;
+                            sheep.setBreed(false);
+                        }
                         if(cooldown.ready(p)) {
                             cooldown.use(p);
                             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 140, 0), true);
@@ -49,6 +53,7 @@ public class EntityFeedListener implements Listener {
                             p.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "You cannot use that ability for (" + cooldown.left(p) + "s)");
                         }
                         e.setCancelled(true);
+
                     }
                 }
             }

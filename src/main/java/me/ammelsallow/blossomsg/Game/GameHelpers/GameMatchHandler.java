@@ -12,11 +12,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class GameMatchHandler {
     private Game game;
@@ -27,6 +30,7 @@ public class GameMatchHandler {
     private ShepherdProximityTask sheep;
     private BukkitTask sheepUpdate;
     private int savePVP;
+    private int speedID;
     public GameMatchHandler(Game game){
         this.game = game;
     }
@@ -44,29 +48,29 @@ public class GameMatchHandler {
     }
     private void initSavePVP(){
         savePVP = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(), new Runnable() {
-            int countDown = 32;
+            int countDown = 30;
             @Override
             public void run() {
 
-                if(countDown > 1){
-                    countDown--;
+                if(countDown > 0){
                     for(Player p : game.getPlayers()){
                         GameScoreboardHandler.setScoreboard(p,countDown,"PVP Enabled ",true,6);
                     }
+                    countDown--;
                 } else{
                     for(Player p : Bukkit.getOnlinePlayers()) {
                         p.sendMessage(Game.sgPrefix + ChatColor.DARK_RED + "" + ChatColor.BOLD +"The grace period is over!");
                         GameScoreboardHandler.setScoreboard(p,countDown,"PVP Enabled ",false,6);
                     }
                     game.getRandomEvent().start();
-                    System.out.println("STARTING");
                     Bukkit.getScheduler().cancelTask(savePVP);
-                    countDown = 32;
+                    countDown = 30;
                 }
             }
         },6L,20L);
     }
     private void prepPlayers(){
+        speedRunnable();
         for(Player p : game.getPlayers()){
             prepPotionEffects(p);
             prepInventory(p);
@@ -75,12 +79,24 @@ public class GameMatchHandler {
             prepKit(p);
         }
     }
+    private void speedRunnable(){
+        speedID = Bukkit.getScheduler().scheduleSyncRepeatingTask(game.getPlugin(),new Runnable(){
+            @Override
+            public void run(){
+                for(Player p : game.getPlayers()) {
+                    if (p.getActivePotionEffects().stream().noneMatch(pe -> pe.getType() == PotionEffectType.SPEED)) {
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, 0));
+                    }
+                }
+            }
+        },0,20L);
+    }
+
     private void prepPotionEffects(Player p){
         p.getActivePotionEffects().forEach(potionEffect -> p.removePotionEffect(potionEffect.getType()));
         p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,630,4));
         p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS,630,4));
         p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,630,4));
-        p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1000000,0));
         p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION,630,1));
     }
     private void prepInventory(Player p){
@@ -107,13 +123,12 @@ public class GameMatchHandler {
         }
     }
     private void selectKit(Player p, String stringID){
-        Inventory inventory = p.getInventory();
-        for(int i = 0; i < BlossomSG.KITS.length; i++){
-            Kit kit = BlossomSG.KITS[i];
+        PlayerInventory inventory = p.getInventory();
+        for(int i = 0; i < BlossomSG.KITS.size(); i++){
+            Kit kit = BlossomSG.KITS.get(i);
             if(stringID.equals(kit.stringID)) {
-                for (int j = 0; j < kit.items.length; j++) {
-                    inventory.setItem(j, kit.items[j]);
-                }
+                inventory.setContents(kit.items);
+                inventory.setArmorContents(kit.armor);
             }
         }
     }
@@ -128,5 +143,12 @@ public class GameMatchHandler {
         if(captureUpdate != null) {
             capture.cancel();
         }
+    }
+    public int getSpeedID() {
+        return speedID;
+    }
+
+    public int getSavePVP(){
+        return savePVP;
     }
 }

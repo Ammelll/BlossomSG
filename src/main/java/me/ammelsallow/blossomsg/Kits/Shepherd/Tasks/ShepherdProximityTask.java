@@ -21,8 +21,8 @@ public class ShepherdProximityTask extends BukkitRunnable {
     }
     @Override
     public void run() {
-        int count = 0;
         for(Player p : g.getPlayers()){
+            int count = 0;
             if(PlayerKitSelection.selectedKit.get(p.getUniqueId()) != null && PlayerKitSelection.selectedKit.get(p.getUniqueId()).equals("shep")){
                 List<Entity> assocEntities = new ArrayList<>();
                 List<UUID> assocUUID = g.getMob(p.getUniqueId());
@@ -35,9 +35,12 @@ public class ShepherdProximityTask extends BukkitRunnable {
                     if(e.getType() == EntityType.SHEEP){
                         count++;
                     }
+                    if(Util.getDistance(e.getLocation(),p.getLocation()) > 15){
+                        e.teleport(p);
+                    }
                 }
+                Util.addHealth(p,count);
             }
-            Util.addHealth(p,count);
         }
     }
 }

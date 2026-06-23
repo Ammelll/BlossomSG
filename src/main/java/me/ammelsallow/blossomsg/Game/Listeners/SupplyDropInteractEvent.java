@@ -2,6 +2,7 @@ package me.ammelsallow.blossomsg.Game.Listeners;
 
 import me.ammelsallow.blossomsg.BlossomSG;
 import me.ammelsallow.blossomsg.Kits.Enderman.Misc.ItemLocation;
+import me.ammelsallow.blossomsg.Kits.Robinhood.Misc.CustomItems;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.NBTTagInt;
 import org.bukkit.*;
@@ -33,30 +34,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SupplyDropInteractEvent implements Listener {
 
-    private BlossomSG plugin;
 
 
-    private ArrayList<Chest> openedChests = new ArrayList<>();
 
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-
         if (event.getClickedBlock() != null) {
-            if (event.getClickedBlock().getType() == Material.ENDER_CHEST) {
-                Block clickedBlock = event.getClickedBlock();
+            Block clickedBlock = event.getClickedBlock();
+            if (clickedBlock.getType() == Material.ENDER_CHEST) {
                 Location blockLocation = clickedBlock.getLocation();
                 World blockWorld = clickedBlock.getWorld();
                 clickedBlock.setType(Material.AIR);
 
                 ItemStack chestplate = new ItemStack(Material.IRON_CHESTPLATE);
                 ItemStack leggings = new ItemStack(Material.IRON_LEGGINGS);
-                ItemStack potion = new Potion(PotionType.SPEED,2).toItemStack(1);
-                PotionMeta potionMeta = (PotionMeta) potion.getItemMeta();
-                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 400, 0), true);
-                potion.setItemMeta(potionMeta);
                 leggings.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
                 chestplate.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+
+                ItemStack healPotion = new Potion(PotionType.INSTANT_HEAL,1,true).toItemStack(1);
 
                 ItemStack diamond = new ItemStack(Material.DIAMOND, 1);
                 net.minecraft.server.v1_8_R3.ItemStack NMSDiamond = CraftItemStack.asNMSCopy(diamond);
@@ -74,29 +69,42 @@ public class SupplyDropInteractEvent implements Listener {
                 double x = blockLocation.getX();
                 double y = blockLocation.getY();
                 double z = blockLocation.getZ();
+                World world = blockLocation.getWorld();
                 ArrayList<ItemLocation> itemLocations = new ArrayList<>();
-                itemLocations.add(new ItemLocation(new Location(blockLocation.getWorld(), x + 2, y + 2, z + 2), new ItemStack(Material.EXP_BOTTLE, 5)));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x + 2, y + 2, z + 1)), chestplate));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x + 2, y + 2, z)), new ItemStack(Material.FISHING_ROD, 1, (short) 58)));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x + 2, y + 2, z - 1.5)), diamond));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x + 1, y + 1.5, z - 1.5)), diamond));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x + 1, y + 1.75, z - 1.25)), diamond));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x + 0.76, y + 2.25, z - 2)), leggings));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x, y + 2, z)), iron));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x - 1.5, y, z + 1.5)), iron));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x + 1.6, y + 2, z)), iron));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x - 1, y + 2, z + 3)), iron));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x - 2, y + 2, z - 1)), iron));
-                itemLocations.add(new ItemLocation((new Location(blockLocation.getWorld(), x, y, z)), potion));
+                itemLocations.add(new ItemLocation(new Location(world, x + 2, y + 2, z + 2), new ItemStack(Material.EXP_BOTTLE, 5)));
+                itemLocations.add(new ItemLocation((new Location(world, x + 2, y + 2, z + 1)), chestplate));
+                itemLocations.add(new ItemLocation((new Location(world, x + 2, y + 2, z)), new ItemStack(Material.FISHING_ROD, 1, (short) 57)));
+                itemLocations.add(new ItemLocation((new Location(world, x + 0.76, y + 2.25, z - 2)), leggings));
+                itemLocations.add(new ItemLocation((new Location(world, x, y, z)), CustomItems.getSplashableSpeed2()));
+                itemLocations.add(new ItemLocation((new Location(world, x-2, y+2, z-1)), healPotion));
+                itemLocations.add(new ItemLocation(new Location(world,x+3,y+2.5,z-2.5),new ItemStack(Material.ARROW,8)));
+                itemLocations.add(new ItemLocation((new Location(world, x - 2, y + 2, z+0.75)), new ItemStack(Material.BOW, 1, (short) 376)));
+                itemLocations.add(new ItemLocation((new Location(world, x + 3.5, y + 1.5, z+3)), new ItemStack(Material.FLINT_AND_STEEL, 1, (short) 55)));
+
+
+
+
+                List<ItemLocation> mineralLocations = new ArrayList<>();
+                mineralLocations.add(new ItemLocation((new Location(world, x, y + 2, z)), iron));
+                mineralLocations.add(new ItemLocation((new Location(world, x - 1.5, y, z + 1.5)), iron));
+                mineralLocations.add(new ItemLocation((new Location(world, x + 1.6, y + 2, z)), iron));
+                mineralLocations.add(new ItemLocation((new Location(world, x - 1, y + 2, z + 3)), iron));
+                mineralLocations.add(new ItemLocation((new Location(world, x - 2, y + 2, z - 1)), iron));
+                mineralLocations.add(new ItemLocation((new Location(world, x + 2, y + 2, z - 1.5)), diamond));
+                mineralLocations.add(new ItemLocation((new Location(world, x + 1, y + 1.5, z - 1.5)), diamond));
+                mineralLocations.add(new ItemLocation((new Location(world, x + 1, y + 1.75, z - 1.25)), diamond));
                 AtomicInteger playerCount = new AtomicInteger();
                 blockWorld.getNearbyEntities(blockLocation, 10, 5, 10).forEach(entity -> {
                     if (entity instanceof Player) {
                         playerCount.getAndIncrement();
                     }
                 });
-                for (int i = 0; i < playerCount.get() * 4; i++) {
+                for (int i = 0; i < playerCount.get() * 3; i++) {
                     int random = (int) (Math.random() * itemLocations.size());
                     blockWorld.dropItem(itemLocations.get(random).getLocation(), itemLocations.get(random).getItemStack());
+                }
+                for(ItemLocation ml : mineralLocations){
+                    blockWorld.dropItem(ml.getLocation(),ml.getItemStack());
                 }
 
 

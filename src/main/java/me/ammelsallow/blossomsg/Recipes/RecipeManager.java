@@ -6,5 +6,6 @@ public class RecipeManager {
 
     public static void addAllRecipes(){
         LumberjackArmorRecipes.addRecipes();
+        VanillaChangedRecipes.addRecipes();
     }
 }
